@@ -10,6 +10,7 @@
     Withdrawn: [],
   };
 
+  const ATS_STAGES = ['Applied', 'Review', 'Interview', 'Offer'];
   const PUBLIC_VIEWS = ['auth', 'companies', 'about', 'contact'];
 
   const state = {
@@ -33,6 +34,14 @@
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#39;');
+
+  const getInitials = (name = 'JH') =>
+    String(name)
+      .trim()
+      .split(/\s+/)
+      .slice(0, 2)
+      .map((w) => w[0]?.toUpperCase() || '')
+      .join('') || 'JH';
 
   // Philippine Peso (PHP) default currency formatter
   const formatMoney = (val, currency = 'PHP') => {
@@ -104,6 +113,13 @@
     $('registerForm').classList.toggle('hidden', isLogin);
   };
 
+  const focusAuthCard = (mode = 'login') => {
+    setAuthMode(mode);
+    switchView('auth');
+    const card = $('authCardAnchor');
+    if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  };
+
   // Navigation with strict auth gate for Browse Jobs & Dashboards
   const switchView = (viewName) => {
     if (!state.user && !PUBLIC_VIEWS.includes(viewName)) {
@@ -133,11 +149,9 @@
   const updateAuthUI = () => {
     const loggedIn = Boolean(state.user);
 
-    // Top-right auth buttons vs user chip
     $('navAuth').classList.toggle('hidden', loggedIn);
     $('navUser').classList.toggle('hidden', !loggedIn);
 
-    // Gate tabs: Sign In only when logged out; Browse Jobs & role tabs only when logged in
     $('tabAuth').classList.toggle('hidden', loggedIn);
     $('tabJobs').classList.toggle('hidden', !loggedIn);
     $('tabSeeker').classList.toggle('hidden', !loggedIn || state.user.role !== 'job_seeker');
@@ -145,6 +159,7 @@
     $('tabAdmin').classList.toggle('hidden', !loggedIn || state.user.role !== 'admin');
 
     if (loggedIn) {
+      $('currentUserAvatar').textContent = getInitials(state.user.name);
       $('currentUserName').textContent = state.user.name;
       $('currentUserRole').textContent = state.user.role.replace('_', ' ');
     }
@@ -218,8 +233,9 @@
       $('jobsList').innerHTML = jobs
         .map((job) => {
           const companyName = job.company?.name || 'Company';
+          const monogram = getInitials(companyName);
           const verified = job.company?.isVerified
-            ? '<span class="verified-badge">Verified</span>'
+            ? '<span class="verified-badge">✓ Verified</span>'
             : '';
           const skillsHtml = (job.skills || [])
             .slice(0, 5)
@@ -229,15 +245,16 @@
 
           return `
             <article class="job-card">
-              <div class="job-card-top">
-                <div>
+              <div class="job-card-head">
+                <div class="company-monogram">${esc(monogram)}</div>
+                <div style="flex:1; min-width:0;">
                   <h3 class="job-title">${esc(job.title)}</h3>
                   <div class="company-line">${esc(companyName)} ${verified}</div>
                 </div>
-                <span class="salary-tag">${formatMoney(job.salary?.min, currency)} – ${formatMoney(job.salary?.max, currency)}</span>
               </div>
+              <span class="salary-tag">${formatMoney(job.salary?.min, currency)} – ${formatMoney(job.salary?.max, currency)} / mo</span>
               <div class="meta-row">
-                <span class="pill">📍 ${esc(job.location)}</span>
+                <span class="pill">${esc(job.location)}</span>
                 <span class="pill">${esc(job.type)}</span>
                 <span class="pill">${esc(job.workMode)}</span>
                 <span class="pill pill-pink">${esc(job.experienceLevel)}</span>
@@ -375,7 +392,7 @@
 
       $('companiesGateNotice').innerHTML = state.user
         ? ''
-        : '<button class="btn btn-pink btn-sm" data-goto-view="auth">Sign In to Browse Their Jobs</button>';
+        : '<button class="btn btn-pink btn-sm" data-goto-view="auth">Sign In to Browse Jobs</button>';
 
       if (!companies.length) {
         $('companiesList').innerHTML = '<div class="empty-state">No companies registered yet.</div>';
@@ -386,14 +403,15 @@
         .map(
           (c) => `
           <article class="company-card">
-            <div class="job-card-top">
-              <div>
+            <div class="job-card-head">
+              <div class="company-monogram">${esc(getInitials(c.name))}</div>
+              <div style="flex:1;">
                 <h3 class="job-title">${esc(c.name)}</h3>
-                <div class="company-line">${esc(c.industry)} • 📍 ${esc(c.location)}</div>
+                <div class="company-line">${esc(c.industry)} • ${esc(c.location)}</div>
               </div>
               ${
                 c.isVerified
-                  ? '<span class="verified-badge">Verified</span>'
+                  ? '<span class="verified-badge">✓ Verified</span>'
                   : '<span class="unverified-badge">Pending</span>'
               }
             </div>
@@ -424,6 +442,19 @@
   };
 
   // ---------- JOB SEEKER DASHBOARD ----------
+  const renderAtsStepper = (status) => {
+    const idx = ATS_STAGES.indexOf(status);
+    if (idx === -1) return '';
+    return `
+      <div class="ats-stepper">
+        ${ATS_STAGES.map((stage, i) => {
+          const cls = i < idx ? 'done' : i === idx ? 'current' : '';
+          return `<div class="ats-step ${cls}">${i + 1}. ${stage}</div>`;
+        }).join('')}
+      </div>
+    `;
+  };
+
   const loadSeekerDashboard = async () => {
     await Promise.all([loadMyApplications(), loadSavedJobs(), loadMySeekerProfile()]);
   };
@@ -454,12 +485,13 @@
 
           return `
             <div class="list-item">
-              <div style="flex:1;">
+              <div style="flex:1; min-width:260px;">
                 <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
                   <strong>${esc(app.job?.title || 'Job Removed')}</strong>
                   <span class="status-badge status-${esc(app.status)}">${esc(app.status)}</span>
                 </div>
                 <div class="muted">${esc(app.company?.name || '')} • ${esc(app.job?.location || '')} • Applied ${formatDate(app.createdAt)}</div>
+                ${renderAtsStepper(app.status)}
                 ${
                   app.interviewDate
                     ? `<div class="muted" style="color:var(--sakura-dark); font-weight:700; margin-top:4px;">Interview Scheduled: ${formatDate(app.interviewDate)}</div>`
@@ -499,9 +531,12 @@
         .map(
           (s) => `
           <article class="job-card">
-            <div>
-              <h3 class="job-title">${esc(s.job.title)}</h3>
-              <div class="company-line">${esc(s.job.company?.name || '')} • 📍 ${esc(s.job.location)}</div>
+            <div class="job-card-head">
+              <div class="company-monogram">${esc(getInitials(s.job.company?.name || 'JH'))}</div>
+              <div>
+                <h3 class="job-title">${esc(s.job.title)}</h3>
+                <div class="company-line">${esc(s.job.company?.name || '')} • ${esc(s.job.location)}</div>
+              </div>
             </div>
             <div class="job-card-footer">
               <button class="btn btn-pink btn-sm" data-open-job="${s.job._id}">View &amp; Apply</button>
@@ -549,6 +584,27 @@
       const res = await api('/jobs/my-jobs?limit=50');
       const { jobs } = res.data;
 
+      const openCount = jobs.filter((j) => j.status === 'open').length;
+      const totalApplicants = jobs.reduce((sum, j) => sum + (j.applicantsCount || 0), 0);
+
+      $('employerSummaryGrid').innerHTML = `
+        <div class="metric-card">
+          <div class="metric-label">Total Job Postings</div>
+          <div class="metric-value">${jobs.length}</div>
+          <div class="metric-sub">All listings created by your company</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Open Bounties</div>
+          <div class="metric-value">${openCount}</div>
+          <div class="metric-sub">Currently accepting hunters</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Total Applicants</div>
+          <div class="metric-value">${totalApplicants}</div>
+          <div class="metric-sub">Candidates across your active roles</div>
+        </div>
+      `;
+
       if (!jobs.length) {
         $('employerJobsList').innerHTML =
           '<div class="empty-state">You have not posted any jobs yet. Use "Post a New Job" to publish your first PHP (₱) listing.</div>';
@@ -565,7 +621,7 @@
                   <strong>${esc(job.title)}</strong>
                   <span class="status-badge status-${esc(job.status)}">${esc(job.status)}</span>
                 </div>
-                <div class="muted">📍 ${esc(job.location)} • ${esc(job.type)} • ${formatMoney(job.salary?.min, currency)}–${formatMoney(job.salary?.max, currency)} • <strong>${job.applicantsCount || 0} applicant(s)</strong></div>
+                <div class="muted">${esc(job.location)} • ${esc(job.type)} • ${formatMoney(job.salary?.min, currency)}–${formatMoney(job.salary?.max, currency)} • <strong>${job.applicantsCount || 0} applicant(s)</strong></div>
               </div>
               <div style="display:flex; gap:8px; flex-wrap:wrap;">
                 <button class="btn btn-pink btn-sm" data-view-applicants="${job._id}">Applicants (${job.applicantsCount || 0})</button>
@@ -739,7 +795,7 @@
             <td><span class="pill">${esc(u.role)}</span></td>
             <td>${
               u.isActive
-                ? '<span class="verified-badge">Active</span>'
+                ? '<span class="verified-badge">✓ Active</span>'
                 : '<span class="status-badge status-Rejected">Inactive</span>'
             }</td>
             <td>
@@ -802,16 +858,35 @@
     });
 
     // Auth page triggers
-    $('btnNavSignIn').addEventListener('click', () => {
-      setAuthMode('login');
-      switchView('auth');
-    });
-    $('btnNavRegister').addEventListener('click', () => {
-      setAuthMode('register');
-      switchView('auth');
-    });
+    $('btnNavSignIn').addEventListener('click', () => focusAuthCard('login'));
+    $('btnNavRegister').addEventListener('click', () => focusAuthCard('register'));
+    $('btnTeaserSignIn').addEventListener('click', () => focusAuthCard('login'));
+    $('btnTeaserRegister').addEventListener('click', () => focusAuthCard('register'));
     $('switchLogin').addEventListener('click', () => setAuthMode('login'));
     $('switchRegister').addEventListener('click', () => setAuthMode('register'));
+
+    // Quick Filter Chips on Browse Jobs
+    $('quickFilterChips').addEventListener('click', (e) => {
+      const chip = e.target.closest('[data-quick-chip]');
+      if (!chip) return;
+
+      $('quickFilterChips')
+        .querySelectorAll('.chip')
+        .forEach((c) => c.classList.remove('active'));
+      chip.classList.add('active');
+
+      $('jobFilterForm').reset();
+      state.companyFilterId = '';
+
+      const mode = chip.dataset.quickChip;
+      if (mode === 'remote') $('filterWorkMode').value = 'remote';
+      if (mode === 'full-time') $('filterType').value = 'full-time';
+      if (mode === 'internship') $('filterType').value = 'internship';
+      if (mode === 'contract') $('filterType').value = 'contract';
+      if (mode === 'high-salary') $('filterMinSalary').value = '80000';
+
+      loadJobs(1);
+    });
 
     $('btnLogout').addEventListener('click', () => {
       state.token = '';
@@ -828,6 +903,17 @@
 
     // Close modal buttons & backdrop click
     document.addEventListener('click', (e) => {
+      const pwBtn = e.target.closest('[data-toggle-pw]');
+      if (pwBtn) {
+        const input = $(pwBtn.dataset.togglePw);
+        if (input) {
+          const showing = input.type === 'text';
+          input.type = showing ? 'password' : 'text';
+          pwBtn.textContent = showing ? 'Show' : 'Hide';
+        }
+        return;
+      }
+
       const closeBtn = e.target.closest('[data-close-modal]');
       if (closeBtn) closeModal(closeBtn.dataset.closeModal);
       if (e.target.classList.contains('modal-backdrop')) {
@@ -909,6 +995,9 @@
     $('btnResetFilters').addEventListener('click', () => {
       $('jobFilterForm').reset();
       state.companyFilterId = '';
+      $('quickFilterChips')
+        .querySelectorAll('.chip')
+        .forEach((c) => c.classList.toggle('active', c.dataset.quickChip === 'all'));
       loadJobs(1);
     });
 

@@ -8,23 +8,33 @@
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
+  <!-- Subtle Ambient Sakura Petals Layer -->
+  <div class="sakura-bg" aria-hidden="true">
+    <span class="petal p1"></span>
+    <span class="petal p2"></span>
+    <span class="petal p3"></span>
+    <span class="petal p4"></span>
+    <span class="petal p5"></span>
+    <span class="petal p6"></span>
+  </div>
+
   <!-- Top Navigation -->
   <header class="navbar">
     <div class="container nav-inner">
       <div class="brand" id="brandHome" role="button" tabindex="0">
         <img src="/images/jobhunters-logo.jpg" alt="JobHunters Logo" class="brand-logo-img" />
         <div>
-          <span class="brand-name">Job<span class="accent-pink">Hunters</span></span>
-          <span class="brand-tag">Grand Line of PH Careers • PHP (₱)</span>
+          <span class="brand-name">Job<span class="accent-pink">Hunters</span><span class="brand-ph">PH</span></span>
+          <span class="brand-tag">Grand Line of Careers • PHP (₱)</span>
         </div>
       </div>
 
       <nav class="nav-tabs" id="navTabs">
         <!-- Visible only when logged out -->
-        <button class="nav-tab active" data-view="auth" id="tabAuth">Sign In</button>
+        <button class="nav-tab active" data-view="auth" id="tabAuth">Home</button>
         <!-- Visible only when logged in -->
         <button class="nav-tab hidden" data-view="jobs" id="tabJobs">Browse Jobs</button>
-        <button class="nav-tab hidden" data-view="seeker" id="tabSeeker">My Applications &amp; Profile</button>
+        <button class="nav-tab hidden" data-view="seeker" id="tabSeeker">My Dashboard</button>
         <button class="nav-tab hidden" data-view="employer" id="tabEmployer">Employer ATS</button>
         <button class="nav-tab hidden" data-view="admin" id="tabAdmin">Admin Panel</button>
         <!-- Always visible -->
@@ -34,14 +44,17 @@
       </nav>
 
       <div class="nav-auth" id="navAuth">
-        <button class="btn btn-outline btn-sm" id="btnNavSignIn">Sign In</button>
+        <button class="btn btn-nav-outline btn-sm" id="btnNavSignIn">Sign In</button>
         <button class="btn btn-pink btn-sm" id="btnNavRegister">Join Crew</button>
       </div>
 
       <div class="nav-user hidden" id="navUser">
         <div class="user-chip">
-          <span class="user-name" id="currentUserName"></span>
-          <span class="role-badge" id="currentUserRole"></span>
+          <span class="user-avatar" id="currentUserAvatar">JH</span>
+          <div class="user-chip-text">
+            <span class="user-name" id="currentUserName"></span>
+            <span class="role-badge" id="currentUserRole"></span>
+          </div>
         </div>
         <button class="btn btn-ghost btn-sm" id="btnLogout">Logout</button>
       </div>
@@ -54,50 +67,70 @@
     <section id="view-auth" class="view-section active">
       <div class="landing-grid">
         <div class="landing-hero">
-          <div class="hero-badge">⚓ Philippines' Adventure-Grade Job Portal • PHP (₱)</div>
-          <div class="landing-brand-row">
-            <img src="/images/jobhunters-logo.jpg" alt="JobHunters Emblem" class="hero-emblem" />
-            <h1>Hunt Your Dream Career Across the <span class="text-pink-glow">Grand Line</span></h1>
-          </div>
-          <p class="hero-copy">
-            Welcome aboard <strong>JobHunters</strong>! Sign in or register to unlock verified Philippine tech openings with transparent monthly <strong>Philippine Peso (₱)</strong> salaries, one-click applications, and real-time Applicant Tracking.
-          </p>
+          <div class="hero-content-layer">
+            <div class="hero-badge">
+              <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+              <span>Philippines' Adventure-Grade Recruitment Portal • PHP (₱)</span>
+            </div>
 
-          <div class="landing-highlights">
-            <div class="highlight-card">
-              <span class="highlight-icon">🧭</span>
-              <div>
-                <strong>Members-Only Job Board</strong>
-                <p>Sign in to browse open bounties, filter by ₱ salary &amp; work mode, and apply directly.</p>
+            <div class="landing-brand-row">
+              <img src="/images/jobhunters-logo.jpg" alt="JobHunters Emblem" class="hero-emblem" />
+              <h1>Hunt Your Dream Career Across the <span class="text-pink-glow">Grand Line</span></h1>
+            </div>
+
+            <p class="hero-copy">
+              Welcome aboard <strong>JobHunters PH</strong>. Sign in or create your free hunter account to unlock verified tech openings across Metro Manila, Cebu, and Remote PH with transparent monthly <strong>Philippine Peso (₱)</strong> bounties.
+            </p>
+
+            <div class="landing-highlights">
+              <div class="highlight-card">
+                <div class="highlight-icon-box blue">
+                  <svg class="svg-icon-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                </div>
+                <div>
+                  <strong>Members-Only Job Board</strong>
+                  <p>Log in to search verified roles, filter by ₱ salary &amp; work mode, bookmark jobs, and apply in seconds.</p>
+                </div>
+              </div>
+              <div class="highlight-card">
+                <div class="highlight-icon-box pink">
+                  <svg class="svg-icon-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+                </div>
+                <div>
+                  <strong>Transparent PHP (₱) Bounties</strong>
+                  <p>Every listing shows clear monthly peso ranges—no guesswork from entry internships to senior leads.</p>
+                </div>
+              </div>
+              <div class="highlight-card">
+                <div class="highlight-icon-box sky">
+                  <svg class="svg-icon-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                </div>
+                <div>
+                  <strong>4-Stage Live ATS Tracker</strong>
+                  <p>Track your voyage in real time: Applied → Review → Interview → Offer with full timeline notes.</p>
+                </div>
               </div>
             </div>
-            <div class="highlight-card">
-              <span class="highlight-icon">🌸</span>
-              <div>
-                <strong>Transparent PHP (₱) Bounties</strong>
-                <p>Every role displays clear monthly Philippine Peso ranges across BGC, Makati, Cebu &amp; Remote PH.</p>
-              </div>
-            </div>
-            <div class="highlight-card">
-              <span class="highlight-icon">⚓</span>
-              <div>
-                <strong>Live ATS Voyage Tracker</strong>
-                <p>Follow every step from Applied → Review → Interview → Offer with timestamped updates.</p>
-              </div>
+
+            <div class="landing-public-links">
+              <span class="muted-light">Exploring first?</span>
+              <button type="button" class="btn btn-glass btn-sm" data-goto-view="companies">Hiring Companies</button>
+              <button type="button" class="btn btn-glass btn-sm" data-goto-view="about">About Us</button>
+              <button type="button" class="btn btn-glass btn-sm" data-goto-view="contact">Contact Crew</button>
             </div>
           </div>
 
-          <div class="landing-public-links">
-            <span class="muted-light">Exploring first?</span>
-            <button type="button" class="btn btn-glass btn-sm" data-goto-view="companies">View Hiring Companies</button>
-            <button type="button" class="btn btn-glass btn-sm" data-goto-view="about">About JobHunters</button>
-            <button type="button" class="btn btn-glass btn-sm" data-goto-view="contact">Contact Crew</button>
-          </div>
+          <!-- Decorative Ocean Wave SVG -->
+          <svg class="hero-wave" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M0,64 C240,120 480,10 720,64 C960,118 1200,20 1440,64 L1440,120 L0,120 Z" fill="rgba(236,72,153,0.18)"/>
+            <path d="M0,88 C320,30 640,125 960,72 C1200,32 1350,82 1440,88 L1440,120 L0,120 Z" fill="rgba(56,189,248,0.16)"/>
+          </svg>
         </div>
 
         <!-- Embedded Sign In / Register Card -->
-        <div class="card auth-panel-card">
+        <div class="card auth-panel-card" id="authCardAnchor">
           <div class="auth-panel-head">
+            <div class="auth-pill-tag">⚓ Hunter Access Gate</div>
             <h2 id="authPanelTitle">Welcome Aboard</h2>
             <p class="muted" id="authPanelSub">Sign in to unlock job hunting, saved roles, and your dashboard.</p>
           </div>
@@ -110,20 +143,36 @@
           <form id="loginForm">
             <div class="form-group">
               <label for="loginEmail">Email Address</label>
-              <input type="email" id="loginEmail" required placeholder="you@example.ph" />
+              <div class="input-icon-wrap">
+                <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                <input type="email" id="loginEmail" required placeholder="you@example.ph" />
+              </div>
             </div>
             <div class="form-group">
               <label for="loginPassword">Password</label>
-              <input type="password" id="loginPassword" required placeholder="••••••••" />
+              <div class="input-icon-wrap">
+                <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                <input type="password" id="loginPassword" required placeholder="Enter your password" />
+                <button type="button" class="pw-toggle" data-toggle-pw="loginPassword" aria-label="Show or hide password">Show</button>
+              </div>
             </div>
-            <button type="submit" class="btn btn-pink btn-block">Sign In &amp; Unlock Jobs</button>
+            <button type="submit" class="btn btn-pink btn-block btn-lg">Sign In &amp; Unlock Jobs</button>
 
             <div class="demo-box">
-              <p class="demo-title">⚡ Quick Demo Crew Login</p>
-              <div class="demo-btns">
-                <button type="button" class="btn btn-outline btn-xs" data-demo-email="alice@seeker.com" data-demo-pass="Seeker@123">Job Seeker (Alice)</button>
-                <button type="button" class="btn btn-outline btn-xs" data-demo-email="hr@techflow.io" data-demo-pass="Employer@123">Employer (TechFlow PH)</button>
-                <button type="button" class="btn btn-outline btn-xs" data-demo-email="admin@jobportal.com" data-demo-pass="Admin@123">Admin</button>
+              <p class="demo-title">One-Click Demo Crew Login</p>
+              <div class="demo-grid">
+                <button type="button" class="demo-chip" data-demo-email="alice@seeker.com" data-demo-pass="Seeker@123">
+                  <strong>Alice Rivera</strong>
+                  <span>Job Seeker</span>
+                </button>
+                <button type="button" class="demo-chip" data-demo-email="hr@techflow.io" data-demo-pass="Employer@123">
+                  <strong>TechFlow PH</strong>
+                  <span>Employer</span>
+                </button>
+                <button type="button" class="demo-chip" data-demo-email="admin@jobportal.com" data-demo-pass="Admin@123">
+                  <strong>System Admin</strong>
+                  <span>Admin</span>
+                </button>
               </div>
             </div>
           </form>
@@ -131,15 +180,25 @@
           <form id="registerForm" class="hidden">
             <div class="form-group">
               <label for="regName">Full Name</label>
-              <input type="text" id="regName" required placeholder="Juan Dela Cruz" />
+              <div class="input-icon-wrap">
+                <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <input type="text" id="regName" required placeholder="Juan Dela Cruz" />
+              </div>
             </div>
             <div class="form-group">
               <label for="regEmail">Email Address</label>
-              <input type="email" id="regEmail" required placeholder="juan@example.ph" />
+              <div class="input-icon-wrap">
+                <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                <input type="email" id="regEmail" required placeholder="juan@example.ph" />
+              </div>
             </div>
             <div class="form-group">
               <label for="regPassword">Password (min 8 chars, letters + numbers)</label>
-              <input type="password" id="regPassword" required minlength="8" placeholder="Hunter@2026" />
+              <div class="input-icon-wrap">
+                <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                <input type="password" id="regPassword" required minlength="8" placeholder="Hunter@2026" />
+                <button type="button" class="pw-toggle" data-toggle-pw="regPassword" aria-label="Show or hide password">Show</button>
+              </div>
             </div>
             <div class="form-group">
               <label for="regRole">Choose Your Role</label>
@@ -148,8 +207,63 @@
                 <option value="employer">Employer (Crew Captain)</option>
               </select>
             </div>
-            <button type="submit" class="btn btn-pink btn-block">Create Account &amp; Set Sail</button>
+            <button type="submit" class="btn btn-pink btn-block btn-lg">Create Account &amp; Set Sail</button>
           </form>
+        </div>
+      </div>
+
+      <!-- Platform Snapshot Strip -->
+      <div class="snapshot-strip">
+        <div class="snapshot-item">
+          <span class="snapshot-num">₱18K – ₱160K</span>
+          <span class="snapshot-label">Monthly PH Tech Bounties</span>
+        </div>
+        <div class="snapshot-item">
+          <span class="snapshot-num">BGC • Cebu • Remote</span>
+          <span class="snapshot-label">Top Philippine Hubs</span>
+        </div>
+        <div class="snapshot-item">
+          <span class="snapshot-num">4-Stage ATS</span>
+          <span class="snapshot-label">Applied → Review → Interview → Offer</span>
+        </div>
+        <div class="snapshot-item">
+          <span class="snapshot-num">JWT + RBAC</span>
+          <span class="snapshot-label">Verified &amp; Secure Platform</span>
+        </div>
+      </div>
+
+      <!-- Locked Job Board Preview Teaser (Cannot browse while logged out) -->
+      <div class="locked-preview-wrap">
+        <div class="locked-preview-blur" aria-hidden="true">
+          <div class="teaser-card">
+            <span class="teaser-bounty">₱95,000 – ₱140,000 / mo</span>
+            <h4>Senior Node.js Backend Engineer</h4>
+            <p>TechFlow Solutions PH • BGC, Taguig • Hybrid</p>
+            <div class="skills-wrap"><span class="pill pill-skill">Node.js</span><span class="pill pill-skill">Express</span><span class="pill pill-skill">MongoDB</span></div>
+          </div>
+          <div class="teaser-card">
+            <span class="teaser-bounty">₱110,000 – ₱160,000 / mo</span>
+            <h4>Cloud &amp; Kubernetes Platform Engineer</h4>
+            <p>CloudScale Labs Cebu • Cebu IT Park • Remote</p>
+            <div class="skills-wrap"><span class="pill pill-skill">Kubernetes</span><span class="pill pill-skill">AWS</span><span class="pill pill-skill">Docker</span></div>
+          </div>
+          <div class="teaser-card">
+            <span class="teaser-bounty">₱65,000 – ₱95,000 / mo</span>
+            <h4>Full-Stack JavaScript Developer</h4>
+            <p>TechFlow Solutions PH • Remote (Philippines)</p>
+            <div class="skills-wrap"><span class="pill pill-skill">React</span><span class="pill pill-skill">Node.js</span><span class="pill pill-skill">MongoDB</span></div>
+          </div>
+        </div>
+        <div class="locked-overlay-card">
+          <div class="lock-circle">
+            <svg class="svg-icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </div>
+          <h3>Job Board Locked for Guests</h3>
+          <p class="muted">Sign in or register as a JobHunter to unlock full job details, monthly PHP (₱) bounties, filters, and one-click applications.</p>
+          <div class="locked-actions">
+            <button type="button" class="btn btn-pink btn-sm" id="btnTeaserSignIn">Sign In to Unlock</button>
+            <button type="button" class="btn btn-outline btn-sm" id="btnTeaserRegister">Create Free Account</button>
+          </div>
         </div>
       </div>
     </section>
@@ -157,10 +271,10 @@
     <!-- VIEW 1: BROWSE JOBS (AUTHENTICATED ONLY) -->
     <section id="view-jobs" class="view-section">
       <div class="hero-banner">
-        <div>
-          <span class="hero-kicker">🧭 Active Bounties Board</span>
-          <h1>Discover Open Roles in the Philippines</h1>
-          <p>Filter by skill, city, work mode, and monthly Philippine Peso (₱) salary range.</p>
+        <div class="hero-banner-text">
+          <span class="hero-kicker">Active Bounties Board • Philippines</span>
+          <h1>Discover Open Tech Roles in PHP (₱)</h1>
+          <p>Filter by skill, city, work mode, and monthly Philippine Peso salary range.</p>
         </div>
         <div class="hero-stats">
           <div class="stat-pill"><strong id="statOpenJobs">-</strong><span>Open Jobs</span></div>
@@ -168,10 +282,26 @@
         </div>
       </div>
 
+      <!-- Quick Filter Chips -->
+      <div class="quick-chips" id="quickFilterChips">
+        <button type="button" class="chip active" data-quick-chip="all">All Roles</button>
+        <button type="button" class="chip" data-quick-chip="remote">Remote PH</button>
+        <button type="button" class="chip" data-quick-chip="full-time">Full-Time</button>
+        <button type="button" class="chip" data-quick-chip="internship">Internships</button>
+        <button type="button" class="chip" data-quick-chip="contract">Contract</button>
+        <button type="button" class="chip" data-quick-chip="high-salary">₱80,000+ / mo</button>
+      </div>
+
       <form class="filter-bar card" id="jobFilterForm">
         <div class="filter-grid">
-          <input type="text" id="filterKeyword" placeholder="Keyword, role, or skill (e.g. Node.js)" />
-          <input type="text" id="filterLocation" placeholder="Location (e.g. BGC, Makati, Cebu, Remote)" />
+          <div class="input-icon-wrap">
+            <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <input type="text" id="filterKeyword" placeholder="Keyword, role, or skill (e.g. Node.js)" />
+          </div>
+          <div class="input-icon-wrap">
+            <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+            <input type="text" id="filterLocation" placeholder="City (BGC, Makati, Cebu, Remote)" />
+          </div>
           <select id="filterType">
             <option value="">All Job Types</option>
             <option value="full-time">Full-Time</option>
@@ -186,7 +316,7 @@
             <option value="hybrid">Hybrid</option>
             <option value="onsite">Onsite</option>
           </select>
-          <input type="number" id="filterMinSalary" placeholder="Min Monthly Salary (₱ PHP)" min="0" step="5000" />
+          <input type="number" id="filterMinSalary" placeholder="Min Salary (₱ PHP)" min="0" step="5000" />
           <select id="filterSort">
             <option value="newest">Sort: Newest</option>
             <option value="salary_desc">Sort: Highest Salary (₱)</option>
@@ -213,7 +343,7 @@
     <section id="view-companies" class="view-section">
       <div class="section-header-banner">
         <div>
-          <span class="hero-kicker">🏢 Partner Crews</span>
+          <span class="hero-kicker">Partner Crews</span>
           <h2>Hiring Companies on JobHunters</h2>
           <p>Discover verified Philippine tech companies and growing teams actively recruiting talent.</p>
         </div>
@@ -228,7 +358,7 @@
         <div class="about-head-row">
           <img src="/images/jobhunters-logo.jpg" alt="JobHunters Logo" class="about-logo" />
           <div>
-            <span class="hero-kicker">⚓ Our Voyage</span>
+            <span class="hero-kicker">Our Voyage</span>
             <h2>About JobHunters PH</h2>
             <p>Connecting Filipino talent and forward-thinking companies through transparent PHP (₱) salaries and streamlined applicant tracking.</p>
           </div>
@@ -237,33 +367,39 @@
 
       <div class="three-cards">
         <div class="card feature-card">
-          <span class="feature-icon">🧭</span>
+          <div class="feature-icon-circle blue">
+            <svg class="svg-icon-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+          </div>
           <h3>For Job Seekers</h3>
           <p class="muted">Create your hunter profile, showcase your skills, upload your PDF/DOCX resume, save favorite openings, and track every application from Applied to Offer.</p>
         </div>
         <div class="card feature-card">
-          <span class="feature-icon">⚓</span>
+          <div class="feature-icon-circle pink">
+            <svg class="svg-icon-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+          </div>
           <h3>For Employers</h3>
           <p class="muted">Publish company profiles and PHP-denominated job listings, review applicants per opening, filter by skills, and advance candidates cleanly through your ATS pipeline.</p>
         </div>
         <div class="card feature-card">
-          <span class="feature-icon">🌸</span>
+          <div class="feature-icon-circle gold">
+            <svg class="svg-icon-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
           <h3>Built for the Philippines</h3>
           <p class="muted">Designed around Metro Manila (BGC, Makati, Ortigas), Cebu IT Park, and nationwide remote work—with every salary clearly listed in Philippine Pesos (₱).</p>
         </div>
       </div>
 
       <div class="card mt-16 about-story">
-        <h3>Why JobHunters?</h3>
+        <h3>Why JobHunters PH?</h3>
         <p class="muted">
-          Inspired by the spirit of adventure and teamwork of the Grand Line, <strong>JobHunters</strong> was engineered as a full-stack Express.js + MongoDB recruitment platform. We believe job hunting should never feel like sailing blind—that's why job browsing is protected for registered members, companies are verified by platform admins, and every application preserves a clear status history timeline.
+          Inspired by the spirit of adventure and camaraderie of the Grand Line, <strong>JobHunters PH</strong> was engineered as a full-stack Express.js + MongoDB recruitment platform. We keep job browsing exclusive to registered members, verify hiring companies through platform admins, and give every candidate a transparent 4-stage status timeline from submission to offer.
         </p>
-        <div class="skills-wrap" style="margin-top:12px;">
+        <div class="skills-wrap" style="margin-top:14px;">
           <span class="pill pill-skill">Node.js &amp; Express.js</span>
           <span class="pill pill-pink">MongoDB &amp; Mongoose</span>
           <span class="pill pill-skill">JWT RBAC Security</span>
           <span class="pill pill-pink">PHP (₱) Salary Transparency</span>
-          <span class="pill pill-skill">Automated ATS Workflow</span>
+          <span class="pill pill-skill">4-Stage Live ATS</span>
         </div>
       </div>
     </section>
@@ -272,7 +408,7 @@
     <section id="view-contact" class="view-section">
       <div class="section-header-banner">
         <div>
-          <span class="hero-kicker">📬 Den Den Mushi Support</span>
+          <span class="hero-kicker">Crew Support</span>
           <h2>Contact JobHunters PH</h2>
           <p>Have questions about hiring, company verification, or your hunter account? Reach out to our Manila crew.</p>
         </div>
@@ -283,28 +419,36 @@
           <h3>Philippine Headquarters</h3>
           <div class="contact-list">
             <div class="contact-item">
-              <span class="contact-icon">📍</span>
+              <div class="feature-icon-circle blue small">
+                <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+              </div>
               <div>
                 <strong>Office Address</strong>
                 <p class="muted">24F Grand Line Tower, High Street South, BGC, Taguig City, Metro Manila 1634, Philippines</p>
               </div>
             </div>
             <div class="contact-item">
-              <span class="contact-icon">✉️</span>
+              <div class="feature-icon-circle pink small">
+                <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+              </div>
               <div>
                 <strong>Email Support</strong>
                 <p class="muted">hello@jobhunters.ph • employers@jobhunters.ph</p>
               </div>
             </div>
             <div class="contact-item">
-              <span class="contact-icon">📞</span>
+              <div class="feature-icon-circle sky small">
+                <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              </div>
               <div>
                 <strong>Hotline (PHT)</strong>
                 <p class="muted">+63 (02) 8555-0199 • +63 917 555 0199</p>
               </div>
             </div>
             <div class="contact-item">
-              <span class="contact-icon">🕒</span>
+              <div class="feature-icon-circle gold small">
+                <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
               <div>
                 <strong>Support Hours</strong>
                 <p class="muted">Monday – Friday, 9:00 AM – 6:00 PM (Philippine Standard Time)</p>
@@ -344,10 +488,11 @@
 
     <!-- VIEW 5: JOB SEEKER DASHBOARD -->
     <section id="view-seeker" class="view-section">
-      <div class="section-header">
+      <div class="section-header-banner">
         <div>
-          <h2>Job Seeker Workspace</h2>
-          <p class="muted">Track your submitted applications, saved bounties, and keep your profile &amp; resume ready.</p>
+          <span class="hero-kicker">Hunter Workspace</span>
+          <h2>My Applications, Bookmarks &amp; Profile</h2>
+          <p>Follow your 4-stage ATS voyage, manage saved PHP (₱) bounties, and keep your CV ready.</p>
         </div>
       </div>
 
@@ -426,12 +571,15 @@
 
     <!-- VIEW 6: EMPLOYER DASHBOARD -->
     <section id="view-employer" class="view-section">
-      <div class="section-header">
+      <div class="section-header-banner">
         <div>
+          <span class="hero-kicker">Crew Captain Console</span>
           <h2>Employer &amp; Applicant Tracking Dashboard</h2>
-          <p class="muted">Manage your company profile, publish PHP (₱) job openings, and move applicants through your hiring pipeline.</p>
+          <p>Manage your company profile, publish PHP (₱) job openings, and advance candidates smoothly.</p>
         </div>
       </div>
+
+      <div class="analytics-grid" id="employerSummaryGrid"></div>
 
       <div class="sub-tabs" id="employerSubTabs">
         <button class="sub-tab active" data-subtab="emp-jobs">My Posted Jobs &amp; Applicants</button>
@@ -566,10 +714,11 @@
 
     <!-- VIEW 7: ADMIN PANEL -->
     <section id="view-admin" class="view-section">
-      <div class="section-header">
+      <div class="section-header-banner">
         <div>
+          <span class="hero-kicker">Fleet Admiral Console</span>
           <h2>Admin Overview &amp; Moderation</h2>
-          <p class="muted">Real-time platform analytics, company verification, and user access control.</p>
+          <p>Real-time platform analytics, company verification, and user access control.</p>
         </div>
       </div>
 
