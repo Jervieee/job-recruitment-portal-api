@@ -12,6 +12,9 @@ const { sendSuccess } = require('./utils/response');
 
 const app = express();
 
+// Trust reverse proxy headers (required for Render / cloud load balancers + express-rate-limit)
+app.set('trust proxy', 1);
+
 // Security HTTP headers
 app.use(helmet());
 

@@ -1,5 +1,7 @@
 # JobHunters PH — Job Recruitment Portal (Express.js + MongoDB)
 
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Jervieee/job-recruitment-portal-api)
+
 A production-structured **Job Recruitment Portal** (`JobHunters`) built with **Node.js**, **Express.js**, and **MongoDB (Mongoose)**, featuring a **One Piece Blue & Pink** web UI localized for the **Philippines (`PHP` / `₱`)**. It connects **Job Seekers**, **Employers**, and **Admins** with JWT role-based authentication, auth-gated job browsing, public Companies/About/Contact pages, company profiles, job postings with advanced search & filtering, resume/CV management, and a full Applicant Tracking System (ATS) workflow.
 
 ---

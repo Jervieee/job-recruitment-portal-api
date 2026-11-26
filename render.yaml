@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: jobhunters-ph
+    runtime: node
+    plan: free
+    buildCommand: npm install --include=dev
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: USE_IN_MEMORY_DB
+        value: "true"
+      - key: CORS_ORIGIN
+        value: "*"
