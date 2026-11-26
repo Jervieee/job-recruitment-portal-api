@@ -1,0 +1,8 @@
+node_modules/
+.env
+coverage/
+uploads/resumes/*
+!uploads/resumes/.gitkeep
+npm-debug.log*
+.DS_Store
+Thumbs.db

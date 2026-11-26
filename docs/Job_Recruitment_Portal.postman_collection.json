@@ -1,0 +1,590 @@
+{
+  "info": {
+    "name": "Job Recruitment Portal API",
+    "_postman_id": "a7b8c9d0-1234-4567-89ab-cdef01234567",
+    "description": "Complete REST API collection for the Job Recruitment Portal (Express.js + MongoDB). Login requests automatically store JWT tokens in collection variables.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000/api" },
+    { "key": "seekerToken", "value": "" },
+    { "key": "employerToken", "value": "" },
+    { "key": "adminToken", "value": "" },
+    { "key": "companyId", "value": "" },
+    { "key": "jobId", "value": "" },
+    { "key": "applicationId", "value": "" },
+    { "key": "seekerUserId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "1. Health & Auth",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/health"
+          }
+        },
+        {
+          "name": "Register Job Seeker",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.token) {",
+                  "  pm.collectionVariables.set('seekerToken', res.data.token);",
+                  "  pm.collectionVariables.set('seekerUserId', res.data.user._id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Jordan Blake\",\n  \"email\": \"jordan@seeker.com\",\n  \"password\": \"Seeker@123\",\n  \"role\": \"job_seeker\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/register"
+          }
+        },
+        {
+          "name": "Register Employer",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.token) {",
+                  "  pm.collectionVariables.set('employerToken', res.data.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Sarah Hiring\",\n  \"email\": \"sarah@novacorp.io\",\n  \"password\": \"Employer@123\",\n  \"role\": \"employer\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/register"
+          }
+        },
+        {
+          "name": "Login Seeded Job Seeker (Alice)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.token) {",
+                  "  pm.collectionVariables.set('seekerToken', res.data.token);",
+                  "  pm.collectionVariables.set('seekerUserId', res.data.user._id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"alice@seeker.com\",\n  \"password\": \"Seeker@123\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/login"
+          }
+        },
+        {
+          "name": "Login Seeded Employer (TechFlow)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.token) {",
+                  "  pm.collectionVariables.set('employerToken', res.data.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"hr@techflow.io\",\n  \"password\": \"Employer@123\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/login"
+          }
+        },
+        {
+          "name": "Login Seeded Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.token) {",
+                  "  pm.collectionVariables.set('adminToken', res.data.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@jobportal.com\",\n  \"password\": \"Admin@123\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/login"
+          }
+        },
+        {
+          "name": "Get Current User (Me)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{seekerToken}}" }],
+            "url": "{{baseUrl}}/auth/me"
+          }
+        },
+        {
+          "name": "Update Password",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{seekerToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"Seeker@123\",\n  \"newPassword\": \"NewSeeker@456\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/password"
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Employer Company Profile",
+      "item": [
+        {
+          "name": "Create or Update My Company Profile",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.company) {",
+                  "  pm.collectionVariables.set('companyId', res.data.company._id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{employerToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"TechFlow Solutions\",\n  \"industry\": \"Software Engineering\",\n  \"description\": \"Building modern cloud developer tools and APIs.\",\n  \"location\": \"San Francisco, CA\",\n  \"website\": \"https://techflow.example.com\",\n  \"size\": \"51-200\",\n  \"foundedYear\": 2019,\n  \"contactEmail\": \"careers@techflow.io\"\n}"
+            },
+            "url": "{{baseUrl}}/companies/me"
+          }
+        },
+        {
+          "name": "Get My Company Profile",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{employerToken}}" }],
+            "url": "{{baseUrl}}/companies/me"
+          }
+        },
+        {
+          "name": "List All Companies (Public)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/companies?page=1&limit=10"
+          }
+        },
+        {
+          "name": "Get Company by ID (Public)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/companies/{{companyId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Job Seeker Profile",
+      "item": [
+        {
+          "name": "Get My Job Seeker Profile",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{seekerToken}}" }],
+            "url": "{{baseUrl}}/profiles/me"
+          }
+        },
+        {
+          "name": "Update My Job Seeker Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{seekerToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"headline\": \"Backend Node.js & MongoDB Engineer\",\n  \"bio\": \"Experienced in building REST APIs with Express.js and Mongoose.\",\n  \"skills\": [\"Node.js\", \"Express\", \"MongoDB\", \"TypeScript\"],\n  \"resumeUrl\": \"https://example.com/resumes/my-cv.pdf\",\n  \"location\": \"Remote\",\n  \"experienceYears\": 3,\n  \"expectedSalary\": 110000,\n  \"portfolioUrl\": \"https://myportfolio.dev\",\n  \"isOpenToWork\": true\n}"
+            },
+            "url": "{{baseUrl}}/profiles/me"
+          }
+        },
+        {
+          "name": "Upload Resume File (PDF/DOCX)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{seekerToken}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "resume",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            },
+            "url": "{{baseUrl}}/profiles/me/resume"
+          }
+        },
+        {
+          "name": "Search Candidates (Employer/Admin)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{employerToken}}" }],
+            "url": "{{baseUrl}}/profiles?skills=Node.js,MongoDB&openToWork=true"
+          }
+        },
+        {
+          "name": "Get Candidate Profile by User ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{employerToken}}" }],
+            "url": "{{baseUrl}}/profiles/{{seekerUserId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Job Postings",
+      "item": [
+        {
+          "name": "Create Job Posting (Employer)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.job) {",
+                  "  pm.collectionVariables.set('jobId', res.data.job._id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{employerToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Backend Express.js Developer\",\n  \"description\": \"Build scalable REST APIs using Express.js, MongoDB, and Mongoose with automated test suites.\",\n  \"requirements\": [\"3+ years Node.js\", \"MongoDB aggregation & indexing\"],\n  \"responsibilities\": [\"Design API endpoints\", \"Maintain CI tests\"],\n  \"skills\": [\"Node.js\", \"Express\", \"MongoDB\", \"Jest\"],\n  \"location\": \"San Francisco, CA\",\n  \"workMode\": \"remote\",\n  \"type\": \"full-time\",\n  \"experienceLevel\": \"mid\",\n  \"salary\": {\n    \"min\": 105000,\n    \"max\": 135000,\n    \"currency\": \"USD\"\n  },\n  \"applicationDeadline\": \"2027-06-30T23:59:59.000Z\"\n}"
+            },
+            "url": "{{baseUrl}}/jobs"
+          }
+        },
+        {
+          "name": "Search & Filter Jobs (Public)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/jobs?keyword=Node&type=full-time&minSalary=90000&sort=salary_desc&page=1&limit=10"
+          }
+        },
+        {
+          "name": "Get Job by ID (Public)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/jobs/{{jobId}}"
+          }
+        },
+        {
+          "name": "Get Employer's Own Jobs",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{employerToken}}" }],
+            "url": "{{baseUrl}}/jobs/my-jobs"
+          }
+        },
+        {
+          "name": "Update Job Posting (Owner Employer)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{employerToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"salary\": {\n    \"min\": 115000,\n    \"max\": 145000,\n    \"currency\": \"USD\"\n  },\n  \"status\": \"open\"\n}"
+            },
+            "url": "{{baseUrl}}/jobs/{{jobId}}"
+          }
+        },
+        {
+          "name": "Delete Job Posting (Owner Employer/Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{employerToken}}" }],
+            "url": "{{baseUrl}}/jobs/{{jobId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Applications & Applicant Tracking",
+      "item": [
+        {
+          "name": "Apply to a Job (Job Seeker)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.application) {",
+                  "  pm.collectionVariables.set('applicationId', res.data.application._id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{seekerToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resumeUrl\": \"https://example.com/resumes/applicant-cv.pdf\",\n  \"coverLetter\": \"I am excited to apply for this backend engineering position.\"\n}"
+            },
+            "url": "{{baseUrl}}/jobs/{{jobId}}/applications"
+          }
+        },
+        {
+          "name": "Get My Applications (Job Seeker)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{seekerToken}}" }],
+            "url": "{{baseUrl}}/applications/me?page=1&limit=10"
+          }
+        },
+        {
+          "name": "Get Applicants for a Job (Employer)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{employerToken}}" }],
+            "url": "{{baseUrl}}/jobs/{{jobId}}/applications"
+          }
+        },
+        {
+          "name": "Get All Employer Applications",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{employerToken}}" }],
+            "url": "{{baseUrl}}/applications/employer"
+          }
+        },
+        {
+          "name": "Get Single Application Details",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{employerToken}}" }],
+            "url": "{{baseUrl}}/applications/{{applicationId}}"
+          }
+        },
+        {
+          "name": "Update Application Status -> Review (Employer)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{employerToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Review\",\n  \"note\": \"Resume meets technical requirements\",\n  \"employerNotes\": \"Strong Node.js and MongoDB background\"\n}"
+            },
+            "url": "{{baseUrl}}/applications/{{applicationId}}/status"
+          }
+        },
+        {
+          "name": "Update Application Status -> Interview (Employer)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{employerToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Interview\",\n  \"note\": \"Scheduled technical interview\",\n  \"interviewDate\": \"2026-12-10T15:00:00.000Z\"\n}"
+            },
+            "url": "{{baseUrl}}/applications/{{applicationId}}/status"
+          }
+        },
+        {
+          "name": "Update Application Status -> Offer (Employer)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{employerToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Offer\",\n  \"note\": \"Congratulations! Extending full-time offer.\"\n}"
+            },
+            "url": "{{baseUrl}}/applications/{{applicationId}}/status"
+          }
+        },
+        {
+          "name": "Withdraw Application (Job Seeker)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{seekerToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"note\": \"Accepted another opportunity\"\n}"
+            },
+            "url": "{{baseUrl}}/applications/{{applicationId}}/withdraw"
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Saved Jobs",
+      "item": [
+        {
+          "name": "Save / Bookmark Job",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{seekerToken}}" }],
+            "url": "{{baseUrl}}/saved-jobs/{{jobId}}"
+          }
+        },
+        {
+          "name": "List My Saved Jobs",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{seekerToken}}" }],
+            "url": "{{baseUrl}}/saved-jobs"
+          }
+        },
+        {
+          "name": "Remove Saved Job",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{seekerToken}}" }],
+            "url": "{{baseUrl}}/saved-jobs/{{jobId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Admin Panel",
+      "item": [
+        {
+          "name": "Get Platform Analytics & Stats",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": "{{baseUrl}}/admin/stats"
+          }
+        },
+        {
+          "name": "List All Users",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": "{{baseUrl}}/admin/users?page=1&limit=20"
+          }
+        },
+        {
+          "name": "Update User Role / Active Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"isActive\": true\n}"
+            },
+            "url": "{{baseUrl}}/admin/users/{{seekerUserId}}"
+          }
+        },
+        {
+          "name": "Verify Company Profile",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"isVerified\": true\n}"
+            },
+            "url": "{{baseUrl}}/admin/companies/{{companyId}}/verify"
+          }
+        }
+      ]
+    }
+  ]
+}
