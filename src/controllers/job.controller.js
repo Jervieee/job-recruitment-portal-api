@@ -50,7 +50,7 @@ const createJob = asyncHandler(async (req, res, next) => {
     salary: {
       min: Number(req.body.salary.min),
       max: Number(req.body.salary.max),
-      currency: req.body.salary.currency || 'USD',
+      currency: req.body.salary.currency || 'PHP',
     },
     status: req.body.status || 'open',
     applicationDeadline: req.body.applicationDeadline || null,

@@ -10,12 +10,14 @@
     Withdrawn: [],
   };
 
+  const PUBLIC_VIEWS = ['auth', 'companies', 'about', 'contact'];
+
   const state = {
     token: localStorage.getItem('jp_token') || '',
     user: null,
     seekerProfile: null,
     companyProfile: null,
-    currentView: 'jobs',
+    currentView: 'auth',
     jobsPage: 1,
     companyFilterId: '',
     activeApplicantsJobId: null,
@@ -32,14 +34,18 @@
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#39;');
 
-  const formatMoney = (val, currency = 'USD') => {
+  // Philippine Peso (PHP) default currency formatter
+  const formatMoney = (val, currency = 'PHP') => {
     const num = Number(val || 0);
-    return `${currency === 'USD' ? '$' : `${currency} `}${num.toLocaleString()}`;
+    const code = (currency || 'PHP').toUpperCase();
+    if (code === 'PHP') return `₱${num.toLocaleString('en-PH')}`;
+    if (code === 'USD') return `$${num.toLocaleString('en-US')}`;
+    return `${code} ${num.toLocaleString()}`;
   };
 
   const formatDate = (dateStr) => {
     if (!dateStr) return 'N/A';
-    return new Date(dateStr).toLocaleDateString(undefined, {
+    return new Date(dateStr).toLocaleDateString('en-PH', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
@@ -53,7 +59,7 @@
     toast.className = `toast ${type}`;
     toast.textContent = message;
     container.appendChild(toast);
-    setTimeout(() => toast.remove(), 3500);
+    setTimeout(() => toast.remove(), 3600);
   };
 
   // Fetch helper
@@ -85,8 +91,30 @@
   const openModal = (id) => $(id).classList.remove('hidden');
   const closeModal = (id) => $(id).classList.add('hidden');
 
-  // Navigation
+  // Auth mode switch on index page
+  const setAuthMode = (mode = 'login') => {
+    const isLogin = mode === 'login';
+    $('authPanelTitle').textContent = isLogin ? 'Welcome Aboard' : 'Join the JobHunters Crew';
+    $('authPanelSub').textContent = isLogin
+      ? 'Sign in to unlock job hunting, saved roles, and your dashboard.'
+      : 'Create a free account to browse PHP (₱) jobs or post openings.';
+    $('switchLogin').classList.toggle('active', isLogin);
+    $('switchRegister').classList.toggle('active', !isLogin);
+    $('loginForm').classList.toggle('hidden', !isLogin);
+    $('registerForm').classList.toggle('hidden', isLogin);
+  };
+
+  // Navigation with strict auth gate for Browse Jobs & Dashboards
   const switchView = (viewName) => {
+    if (!state.user && !PUBLIC_VIEWS.includes(viewName)) {
+      showToast('Please sign in or register first to browse jobs.', 'info');
+      viewName = 'auth';
+    }
+
+    if (state.user && viewName === 'auth') {
+      viewName = 'jobs';
+    }
+
     state.currentView = viewName;
     document.querySelectorAll('.view-section').forEach((sec) => {
       sec.classList.toggle('active', sec.id === `view-${viewName}`);
@@ -104,9 +132,14 @@
 
   const updateAuthUI = () => {
     const loggedIn = Boolean(state.user);
+
+    // Top-right auth buttons vs user chip
     $('navAuth').classList.toggle('hidden', loggedIn);
     $('navUser').classList.toggle('hidden', !loggedIn);
 
+    // Gate tabs: Sign In only when logged out; Browse Jobs & role tabs only when logged in
+    $('tabAuth').classList.toggle('hidden', loggedIn);
+    $('tabJobs').classList.toggle('hidden', !loggedIn);
     $('tabSeeker').classList.toggle('hidden', !loggedIn || state.user.role !== 'job_seeker');
     $('tabEmployer').classList.toggle('hidden', !loggedIn || state.user.role !== 'employer');
     $('tabAdmin').classList.toggle('hidden', !loggedIn || state.user.role !== 'admin');
@@ -139,8 +172,9 @@
     updateAuthUI();
   };
 
-  // ---------- JOBS ----------
+  // ---------- JOBS (AUTHENTICATED ONLY) ----------
   const loadJobs = async (page = state.jobsPage) => {
+    if (!state.user) return;
     state.jobsPage = page;
     const params = new URLSearchParams();
     params.set('page', page);
@@ -168,7 +202,7 @@
 
       $('jobsCountLabel').textContent = state.companyFilterId
         ? `Showing ${jobs.length} of ${meta.total} job(s) for selected company`
-        : `Showing ${jobs.length} of ${meta.total} open job(s)`;
+        : `Showing ${jobs.length} of ${meta.total} active job bounties`;
 
       if (!kw && !loc && !type && !mode && !minSal && !state.companyFilterId) {
         $('statOpenJobs').textContent = meta.total;
@@ -191,6 +225,7 @@
             .slice(0, 5)
             .map((s) => `<span class="pill pill-skill">${esc(s)}</span>`)
             .join('');
+          const currency = job.salary?.currency || 'PHP';
 
           return `
             <article class="job-card">
@@ -199,25 +234,24 @@
                   <h3 class="job-title">${esc(job.title)}</h3>
                   <div class="company-line">${esc(companyName)} ${verified}</div>
                 </div>
-                <span class="salary-tag">${formatMoney(job.salary?.min, job.salary?.currency)} – ${formatMoney(job.salary?.max, job.salary?.currency)}</span>
+                <span class="salary-tag">${formatMoney(job.salary?.min, currency)} – ${formatMoney(job.salary?.max, currency)}</span>
               </div>
               <div class="meta-row">
-                <span class="pill">${esc(job.location)}</span>
+                <span class="pill">📍 ${esc(job.location)}</span>
                 <span class="pill">${esc(job.type)}</span>
                 <span class="pill">${esc(job.workMode)}</span>
-                <span class="pill">${esc(job.experienceLevel)}</span>
+                <span class="pill pill-pink">${esc(job.experienceLevel)}</span>
               </div>
               <div class="skills-wrap">${skillsHtml}</div>
               <div class="job-card-footer">
                 <span class="muted">${job.applicantsCount || 0} applicant(s)</span>
-                <button class="btn btn-primary btn-sm" data-open-job="${job._id}">View &amp; Apply</button>
+                <button class="btn btn-pink btn-sm" data-open-job="${job._id}">View &amp; Apply</button>
               </div>
             </article>
           `;
         })
         .join('');
 
-      // Pagination controls
       $('jobsPagination').innerHTML = `
         <button class="btn btn-ghost btn-sm" id="btnPrevJobs" ${!meta.hasPrevPage ? 'disabled' : ''}>Previous</button>
         <span class="muted">Page ${meta.page} of ${meta.totalPages}</span>
@@ -237,6 +271,7 @@
     try {
       const res = await api(`/jobs/${jobId}`);
       const { job } = res.data;
+      const currency = job.salary?.currency || 'PHP';
 
       $('detailJobTitle').textContent = job.title;
       $('detailJobSubtitle').textContent = `${job.company?.name || 'Company'} • ${job.location} (${job.workMode}) • ${job.type}`;
@@ -263,26 +298,20 @@
             </div>
             <div class="form-group">
               <label for="applyCoverLetter">Cover Letter</label>
-              <textarea id="applyCoverLetter" rows="3" placeholder="Tell the hiring team why you're a great fit..."></textarea>
+              <textarea id="applyCoverLetter" rows="3" placeholder="Tell the hiring crew why you're a great fit..."></textarea>
             </div>
             <div style="display:flex; gap:10px; flex-wrap:wrap;">
-              <button type="submit" class="btn btn-primary">Submit Application</button>
+              <button type="submit" class="btn btn-pink">Submit Application</button>
               <button type="button" class="btn btn-outline" id="btnSaveJobModal" data-save-job="${job._id}">Save Job</button>
             </div>
           </form>
-        `;
-      } else if (!state.user) {
-        actionBlock = `
-          <hr />
-          <p class="muted">Sign in as a <strong>Job Seeker</strong> to apply or bookmark this position.</p>
-          <button type="button" class="btn btn-primary" id="btnSignInToApply">Sign In to Apply</button>
         `;
       }
 
       $('jobDetailBody').innerHTML = `
         <div class="meta-row" style="margin-bottom:12px;">
-          <span class="salary-tag">${formatMoney(job.salary?.min, job.salary?.currency)} – ${formatMoney(job.salary?.max, job.salary?.currency)}</span>
-          <span class="pill">${esc(job.experienceLevel)} level</span>
+          <span class="salary-tag">${formatMoney(job.salary?.min, currency)} – ${formatMoney(job.salary?.max, currency)} / mo</span>
+          <span class="pill pill-pink">${esc(job.experienceLevel)} level</span>
           <span class="pill">Deadline: ${formatDate(job.applicationDeadline)}</span>
           <span class="pill">${job.viewsCount || 0} views</span>
         </div>
@@ -329,26 +358,24 @@
         });
       }
 
-      const signInBtn = $('btnSignInToApply');
-      if (signInBtn) {
-        signInBtn.addEventListener('click', () => {
-          closeModal('jobDetailModal');
-          openAuthModal('login');
-        });
-      }
-
       openModal('jobDetailModal');
     } catch (err) {
       showToast(err.message, 'error');
     }
   };
 
-  // ---------- COMPANIES ----------
+  // ---------- COMPANIES (PUBLIC) ----------
   const loadCompanies = async () => {
     try {
       const res = await api('/companies?limit=30');
       const { companies } = res.data;
-      $('statCompanies').textContent = res.meta.total;
+      if ($('statCompanies')) {
+        $('statCompanies').textContent = res.meta.total;
+      }
+
+      $('companiesGateNotice').innerHTML = state.user
+        ? ''
+        : '<button class="btn btn-pink btn-sm" data-goto-view="auth">Sign In to Browse Their Jobs</button>';
 
       if (!companies.length) {
         $('companiesList').innerHTML = '<div class="empty-state">No companies registered yet.</div>';
@@ -362,7 +389,7 @@
             <div class="job-card-top">
               <div>
                 <h3 class="job-title">${esc(c.name)}</h3>
-                <div class="company-line">${esc(c.industry)} • ${esc(c.location)}</div>
+                <div class="company-line">${esc(c.industry)} • 📍 ${esc(c.location)}</div>
               </div>
               ${
                 c.isVerified
@@ -372,7 +399,7 @@
             </div>
             <p class="muted" style="margin:0;">${esc(c.description)}</p>
             <div class="meta-row">
-              <span class="pill">Size: ${esc(c.size || 'N/A')}</span>
+              <span class="pill">Crew Size: ${esc(c.size || 'N/A')}</span>
               ${c.foundedYear ? `<span class="pill">Est. ${c.foundedYear}</span>` : ''}
             </div>
             <div class="job-card-footer">
@@ -381,7 +408,11 @@
                   ? `<a href="${esc(c.website)}" target="_blank" rel="noopener" class="muted">Website ↗</a>`
                   : '<span></span>'
               }
-              <button class="btn btn-outline btn-sm" data-filter-company="${c._id}">View Open Jobs</button>
+              ${
+                state.user
+                  ? `<button class="btn btn-outline btn-sm" data-filter-company="${c._id}">View Open Jobs</button>`
+                  : `<button class="btn btn-outline btn-sm" data-goto-view="auth">Sign In to View Jobs</button>`
+              }
             </div>
           </article>
         `
@@ -404,7 +435,7 @@
 
       if (!applications.length) {
         $('myApplicationsList').innerHTML =
-          '<div class="empty-state">You have not applied to any jobs yet. Browse Jobs to get started!</div>';
+          '<div class="empty-state">You have not applied to any jobs yet. Head to Browse Jobs to start hunting!</div>';
         return;
       }
 
@@ -431,7 +462,7 @@
                 <div class="muted">${esc(app.company?.name || '')} • ${esc(app.job?.location || '')} • Applied ${formatDate(app.createdAt)}</div>
                 ${
                   app.interviewDate
-                    ? `<div class="muted" style="color:var(--primary); font-weight:600; margin-top:4px;">Interview Scheduled: ${formatDate(app.interviewDate)}</div>`
+                    ? `<div class="muted" style="color:var(--sakura-dark); font-weight:700; margin-top:4px;">Interview Scheduled: ${formatDate(app.interviewDate)}</div>`
                     : ''
                 }
                 <div class="timeline">${timelineHtml}</div>
@@ -470,10 +501,10 @@
           <article class="job-card">
             <div>
               <h3 class="job-title">${esc(s.job.title)}</h3>
-              <div class="company-line">${esc(s.job.company?.name || '')} • ${esc(s.job.location)}</div>
+              <div class="company-line">${esc(s.job.company?.name || '')} • 📍 ${esc(s.job.location)}</div>
             </div>
             <div class="job-card-footer">
-              <button class="btn btn-primary btn-sm" data-open-job="${s.job._id}">View &amp; Apply</button>
+              <button class="btn btn-pink btn-sm" data-open-job="${s.job._id}">View &amp; Apply</button>
               <button class="btn btn-danger btn-sm" data-unsave-job="${s.job._id}">Remove</button>
             </div>
           </article>
@@ -520,31 +551,32 @@
 
       if (!jobs.length) {
         $('employerJobsList').innerHTML =
-          '<div class="empty-state">You have not posted any jobs yet. Use the "Post a New Job" tab to create your first listing.</div>';
+          '<div class="empty-state">You have not posted any jobs yet. Use "Post a New Job" to publish your first PHP (₱) listing.</div>';
         return;
       }
 
       $('employerJobsList').innerHTML = jobs
-        .map(
-          (job) => `
-          <div class="list-item">
-            <div>
-              <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-                <strong>${esc(job.title)}</strong>
-                <span class="status-badge status-${esc(job.status)}">${esc(job.status)}</span>
+        .map((job) => {
+          const currency = job.salary?.currency || 'PHP';
+          return `
+            <div class="list-item">
+              <div>
+                <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                  <strong>${esc(job.title)}</strong>
+                  <span class="status-badge status-${esc(job.status)}">${esc(job.status)}</span>
+                </div>
+                <div class="muted">📍 ${esc(job.location)} • ${esc(job.type)} • ${formatMoney(job.salary?.min, currency)}–${formatMoney(job.salary?.max, currency)} • <strong>${job.applicantsCount || 0} applicant(s)</strong></div>
               </div>
-              <div class="muted">${esc(job.location)} • ${esc(job.type)} • ${formatMoney(job.salary?.min, job.salary?.currency)}–${formatMoney(job.salary?.max, job.salary?.currency)} • <strong>${job.applicantsCount || 0} applicant(s)</strong></div>
+              <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <button class="btn btn-pink btn-sm" data-view-applicants="${job._id}">Applicants (${job.applicantsCount || 0})</button>
+                <button class="btn btn-ghost btn-sm" data-toggle-job-status="${job._id}" data-next-status="${job.status === 'open' ? 'closed' : 'open'}">
+                  ${job.status === 'open' ? 'Close Job' : 'Reopen Job'}
+                </button>
+                <button class="btn btn-danger btn-sm" data-delete-job="${job._id}">Delete</button>
+              </div>
             </div>
-            <div style="display:flex; gap:8px; flex-wrap:wrap;">
-              <button class="btn btn-primary btn-sm" data-view-applicants="${job._id}">Applicants (${job.applicantsCount || 0})</button>
-              <button class="btn btn-ghost btn-sm" data-toggle-job-status="${job._id}" data-next-status="${job.status === 'open' ? 'closed' : 'open'}">
-                ${job.status === 'open' ? 'Close Job' : 'Reopen Job'}
-              </button>
-              <button class="btn btn-danger btn-sm" data-delete-job="${job._id}">Delete</button>
-            </div>
-          </div>
-        `
-        )
+          `;
+        })
         .join('');
     } catch (err) {
       showToast(err.message, 'error');
@@ -565,7 +597,7 @@
       $('compEmail').value = c.contactEmail || '';
       $('compDescription').value = c.description || '';
     } catch (err) {
-      // 404 is expected if new employer hasn't created company profile yet
+      // Expected if new employer hasn't created company profile yet
     }
   };
 
@@ -602,7 +634,7 @@
                   ${allowed.map((st) => `<option value="${st}">Move to: ${st}</option>`).join('')}
                 </select>
                 <input type="text" name="note" placeholder="Optional note for timeline..." />
-                <button type="submit" class="btn btn-primary btn-sm">Update Status</button>
+                <button type="submit" class="btn btn-pink btn-sm">Update Status</button>
               </form>
             `
             : `<div class="muted" style="margin-top:8px;">No further status transitions available (${esc(app.status)}).</div>`;
@@ -667,7 +699,6 @@
         </div>
       `;
 
-      // Top skills
       const skills = stats.topInDemandSkills || [];
       const maxCount = skills.length ? Math.max(...skills.map((s) => s.count)) : 1;
       $('adminTopSkills').innerHTML = skills.length
@@ -683,7 +714,6 @@
             .join('')
         : '<div class="muted">No open job skill data yet.</div>';
 
-      // Companies verification list
       $('adminCompaniesList').innerHTML = companiesRes.data.companies
         .map(
           (c) => `
@@ -700,7 +730,6 @@
         )
         .join('');
 
-      // Users table
       $('adminUsersBody').innerHTML = usersRes.data.users
         .map(
           (u) => `
@@ -731,22 +760,11 @@
     }
   };
 
-  // ---------- AUTH MODAL ----------
-  const openAuthModal = (mode = 'login') => {
-    const isLogin = mode === 'login';
-    $('authModalTitle').textContent = isLogin ? 'Sign In' : 'Create Account';
-    $('switchLogin').classList.toggle('active', isLogin);
-    $('switchRegister').classList.toggle('active', !isLogin);
-    $('loginForm').classList.toggle('hidden', !isLogin);
-    $('registerForm').classList.toggle('hidden', isLogin);
-    openModal('authModal');
-  };
-
+  // ---------- AUTH HANDLER ----------
   const handleAuthSuccess = async (token, msg) => {
     state.token = token;
     localStorage.setItem('jp_token', token);
     await loadCurrentUser();
-    closeModal('authModal');
     showToast(msg, 'success');
 
     if (state.user?.role === 'employer') switchView('employer');
@@ -758,7 +776,7 @@
   const bindEvents = () => {
     $('brandHome').addEventListener('click', () => {
       state.companyFilterId = '';
-      switchView('jobs');
+      switchView(state.user ? 'jobs' : 'auth');
     });
 
     $('navTabs').addEventListener('click', (e) => {
@@ -783,21 +801,29 @@
       });
     });
 
-    // Auth modal triggers
-    $('btnOpenLogin').addEventListener('click', () => openAuthModal('login'));
-    $('btnOpenRegister').addEventListener('click', () => openAuthModal('register'));
-    $('switchLogin').addEventListener('click', () => openAuthModal('login'));
-    $('switchRegister').addEventListener('click', () => openAuthModal('register'));
+    // Auth page triggers
+    $('btnNavSignIn').addEventListener('click', () => {
+      setAuthMode('login');
+      switchView('auth');
+    });
+    $('btnNavRegister').addEventListener('click', () => {
+      setAuthMode('register');
+      switchView('auth');
+    });
+    $('switchLogin').addEventListener('click', () => setAuthMode('login'));
+    $('switchRegister').addEventListener('click', () => setAuthMode('register'));
 
     $('btnLogout').addEventListener('click', () => {
       state.token = '';
       state.user = null;
       state.seekerProfile = null;
       state.companyProfile = null;
+      state.companyFilterId = '';
       localStorage.removeItem('jp_token');
       updateAuthUI();
-      switchView('jobs');
-      showToast('Signed out successfully.');
+      setAuthMode('login');
+      switchView('auth');
+      showToast('Signed out. Sign back in anytime to browse jobs.');
     });
 
     // Close modal buttons & backdrop click
@@ -820,7 +846,7 @@
               password: btn.dataset.demoPass,
             }),
           });
-          await handleAuthSuccess(res.data.token, `Signed in as ${res.data.user.name}`);
+          await handleAuthSuccess(res.data.token, `Welcome aboard, ${res.data.user.name}!`);
         } catch (err) {
           showToast(err.message, 'error');
         }
@@ -857,10 +883,21 @@
             role: $('regRole').value,
           }),
         });
-        await handleAuthSuccess(res.data.token, `Account created! Welcome, ${res.data.user.name}.`);
+        await handleAuthSuccess(res.data.token, `Account created! Welcome aboard, ${res.data.user.name}.`);
       } catch (err) {
         showToast(err.message, 'error');
       }
+    });
+
+    // Contact form
+    $('contactForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const sender = $('contactName').value.trim();
+      const feedback = $('contactFeedback');
+      feedback.textContent = `Salamat, ${sender}! Your message has been received by the JobHunters PH support crew. We'll respond within 1 business day.`;
+      feedback.classList.remove('hidden');
+      showToast('Message sent to JobHunters PH support!', 'success');
+      $('contactForm').reset();
     });
 
     // Job search form
@@ -943,7 +980,7 @@
       }
     });
 
-    // Create Job form
+    // Create Job form (PHP currency)
     $('createJobForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       try {
@@ -965,7 +1002,7 @@
           salary: {
             min: Number($('jobSalaryMin').value),
             max: Number($('jobSalaryMax').value),
-            currency: 'USD',
+            currency: 'PHP',
           },
           skills,
           description: $('jobDescription').value.trim(),
@@ -976,7 +1013,7 @@
         }
 
         await api('/jobs', { method: 'POST', body: JSON.stringify(payload) });
-        showToast('Job posting published!', 'success');
+        showToast('Job posting published in PHP (₱)!', 'success');
         $('createJobForm').reset();
         await loadEmployerJobs();
         document.querySelector('[data-subtab="emp-jobs"]').click();
@@ -987,6 +1024,13 @@
 
     // Dynamic button delegation across views & modals
     document.addEventListener('click', async (e) => {
+      const gotoBtn = e.target.closest('[data-goto-view]');
+      if (gotoBtn) {
+        if (gotoBtn.dataset.gotoView === 'auth') setAuthMode('login');
+        switchView(gotoBtn.dataset.gotoView);
+        return;
+      }
+
       const openJobBtn = e.target.closest('[data-open-job]');
       if (openJobBtn) return openJobDetail(openJobBtn.dataset.openJob);
 
@@ -1002,7 +1046,7 @@
         try {
           await api(`/applications/${withdrawBtn.dataset.withdrawApp}/withdraw`, {
             method: 'PATCH',
-            body: JSON.stringify({ note: 'Withdrawn via web portal' }),
+            body: JSON.stringify({ note: 'Withdrawn via JobHunters portal' }),
           });
           showToast('Application withdrawn.', 'success');
           loadMyApplications();
@@ -1110,11 +1154,12 @@
     });
   };
 
-  // Init
+  // Init: start on Login index if logged out, or Browse Jobs if already authenticated
   const init = async () => {
     bindEvents();
     await loadCurrentUser();
-    await Promise.all([loadJobs(1), loadCompanies()]);
+    await loadCompanies();
+    switchView(state.user ? 'jobs' : 'auth');
   };
 
   init();

@@ -46,8 +46,10 @@ app.use('/api', apiLimiter);
 app.get('/api', (req, res) =>
   sendSuccess(res, {
     statusCode: 200,
-    message: 'Welcome to the Job Recruitment Portal REST API',
+    message: 'Welcome to the JobHunters Recruitment Portal REST API (PH)',
     data: {
+      name: 'JobHunters',
+      currency: 'PHP',
       version: '1.0.0',
       webUi: '/',
       healthCheck: '/api/health',

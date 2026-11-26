@@ -1,6 +1,6 @@
-# Job Recruitment Portal — REST API (Express.js + MongoDB)
+# JobHunters PH — Job Recruitment Portal (Express.js + MongoDB)
 
-A production-structured **Job Recruitment Portal** backend built with **Node.js**, **Express.js**, and **MongoDB (Mongoose)**. It connects **Job Seekers**, **Employers**, and **Admins** with JWT role-based authentication, company profiles, job postings with advanced search & filtering, resume/CV management, and a full Applicant Tracking System (ATS) workflow.
+A production-structured **Job Recruitment Portal** (`JobHunters`) built with **Node.js**, **Express.js**, and **MongoDB (Mongoose)**, featuring a **One Piece Blue & Pink** web UI localized for the **Philippines (`PHP` / `₱`)**. It connects **Job Seekers**, **Employers**, and **Admins** with JWT role-based authentication, auth-gated job browsing, public Companies/About/Contact pages, company profiles, job postings with advanced search & filtering, resume/CV management, and a full Applicant Tracking System (ATS) workflow.
 
 ---
 

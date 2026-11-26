@@ -102,7 +102,7 @@ const jobSchema = new mongoose.Schema(
         type: String,
         uppercase: true,
         trim: true,
-        default: 'USD',
+        default: 'PHP',
         maxlength: [5, 'Currency code cannot exceed 5 characters'],
       },
     },

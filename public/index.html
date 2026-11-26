@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TalentBridge — Job Recruitment Portal</title>
+  <title>JobHunters PH — Set Sail for Your Dream Career</title>
+  <link rel="icon" type="image/jpeg" href="/images/jobhunters-logo.jpg" />
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
@@ -11,24 +12,30 @@
   <header class="navbar">
     <div class="container nav-inner">
       <div class="brand" id="brandHome" role="button" tabindex="0">
-        <span class="brand-logo">TB</span>
+        <img src="/images/jobhunters-logo.jpg" alt="JobHunters Logo" class="brand-logo-img" />
         <div>
-          <span class="brand-name">TalentBridge</span>
-          <span class="brand-tag">Job Recruitment Portal</span>
+          <span class="brand-name">Job<span class="accent-pink">Hunters</span></span>
+          <span class="brand-tag">Grand Line of PH Careers • PHP (₱)</span>
         </div>
       </div>
 
       <nav class="nav-tabs" id="navTabs">
-        <button class="nav-tab active" data-view="jobs">Browse Jobs</button>
-        <button class="nav-tab" data-view="companies">Companies</button>
+        <!-- Visible only when logged out -->
+        <button class="nav-tab active" data-view="auth" id="tabAuth">Sign In</button>
+        <!-- Visible only when logged in -->
+        <button class="nav-tab hidden" data-view="jobs" id="tabJobs">Browse Jobs</button>
         <button class="nav-tab hidden" data-view="seeker" id="tabSeeker">My Applications &amp; Profile</button>
         <button class="nav-tab hidden" data-view="employer" id="tabEmployer">Employer ATS</button>
         <button class="nav-tab hidden" data-view="admin" id="tabAdmin">Admin Panel</button>
+        <!-- Always visible -->
+        <button class="nav-tab" data-view="companies" id="tabCompanies">Companies</button>
+        <button class="nav-tab" data-view="about" id="tabAbout">About</button>
+        <button class="nav-tab" data-view="contact" id="tabContact">Contact</button>
       </nav>
 
       <div class="nav-auth" id="navAuth">
-        <button class="btn btn-ghost" id="btnOpenLogin">Sign In</button>
-        <button class="btn btn-primary" id="btnOpenRegister">Register</button>
+        <button class="btn btn-outline btn-sm" id="btnNavSignIn">Sign In</button>
+        <button class="btn btn-pink btn-sm" id="btnNavRegister">Join Crew</button>
       </div>
 
       <div class="nav-user hidden" id="navUser">
@@ -43,24 +50,128 @@
 
   <!-- Main Content -->
   <main class="container main-content">
-    <!-- VIEW 1: BROWSE JOBS -->
-    <section id="view-jobs" class="view-section active">
+    <!-- VIEW 0 (INDEX): AUTH LANDING (SIGN IN & REGISTER) -->
+    <section id="view-auth" class="view-section active">
+      <div class="landing-grid">
+        <div class="landing-hero">
+          <div class="hero-badge">⚓ Philippines' Adventure-Grade Job Portal • PHP (₱)</div>
+          <div class="landing-brand-row">
+            <img src="/images/jobhunters-logo.jpg" alt="JobHunters Emblem" class="hero-emblem" />
+            <h1>Hunt Your Dream Career Across the <span class="text-pink-glow">Grand Line</span></h1>
+          </div>
+          <p class="hero-copy">
+            Welcome aboard <strong>JobHunters</strong>! Sign in or register to unlock verified Philippine tech openings with transparent monthly <strong>Philippine Peso (₱)</strong> salaries, one-click applications, and real-time Applicant Tracking.
+          </p>
+
+          <div class="landing-highlights">
+            <div class="highlight-card">
+              <span class="highlight-icon">🧭</span>
+              <div>
+                <strong>Members-Only Job Board</strong>
+                <p>Sign in to browse open bounties, filter by ₱ salary &amp; work mode, and apply directly.</p>
+              </div>
+            </div>
+            <div class="highlight-card">
+              <span class="highlight-icon">🌸</span>
+              <div>
+                <strong>Transparent PHP (₱) Bounties</strong>
+                <p>Every role displays clear monthly Philippine Peso ranges across BGC, Makati, Cebu &amp; Remote PH.</p>
+              </div>
+            </div>
+            <div class="highlight-card">
+              <span class="highlight-icon">⚓</span>
+              <div>
+                <strong>Live ATS Voyage Tracker</strong>
+                <p>Follow every step from Applied → Review → Interview → Offer with timestamped updates.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="landing-public-links">
+            <span class="muted-light">Exploring first?</span>
+            <button type="button" class="btn btn-glass btn-sm" data-goto-view="companies">View Hiring Companies</button>
+            <button type="button" class="btn btn-glass btn-sm" data-goto-view="about">About JobHunters</button>
+            <button type="button" class="btn btn-glass btn-sm" data-goto-view="contact">Contact Crew</button>
+          </div>
+        </div>
+
+        <!-- Embedded Sign In / Register Card -->
+        <div class="card auth-panel-card">
+          <div class="auth-panel-head">
+            <h2 id="authPanelTitle">Welcome Aboard</h2>
+            <p class="muted" id="authPanelSub">Sign in to unlock job hunting, saved roles, and your dashboard.</p>
+          </div>
+
+          <div class="auth-switch">
+            <button type="button" class="sub-tab active" id="switchLogin">Sign In</button>
+            <button type="button" class="sub-tab" id="switchRegister">Register</button>
+          </div>
+
+          <form id="loginForm">
+            <div class="form-group">
+              <label for="loginEmail">Email Address</label>
+              <input type="email" id="loginEmail" required placeholder="you@example.ph" />
+            </div>
+            <div class="form-group">
+              <label for="loginPassword">Password</label>
+              <input type="password" id="loginPassword" required placeholder="••••••••" />
+            </div>
+            <button type="submit" class="btn btn-pink btn-block">Sign In &amp; Unlock Jobs</button>
+
+            <div class="demo-box">
+              <p class="demo-title">⚡ Quick Demo Crew Login</p>
+              <div class="demo-btns">
+                <button type="button" class="btn btn-outline btn-xs" data-demo-email="alice@seeker.com" data-demo-pass="Seeker@123">Job Seeker (Alice)</button>
+                <button type="button" class="btn btn-outline btn-xs" data-demo-email="hr@techflow.io" data-demo-pass="Employer@123">Employer (TechFlow PH)</button>
+                <button type="button" class="btn btn-outline btn-xs" data-demo-email="admin@jobportal.com" data-demo-pass="Admin@123">Admin</button>
+              </div>
+            </div>
+          </form>
+
+          <form id="registerForm" class="hidden">
+            <div class="form-group">
+              <label for="regName">Full Name</label>
+              <input type="text" id="regName" required placeholder="Juan Dela Cruz" />
+            </div>
+            <div class="form-group">
+              <label for="regEmail">Email Address</label>
+              <input type="email" id="regEmail" required placeholder="juan@example.ph" />
+            </div>
+            <div class="form-group">
+              <label for="regPassword">Password (min 8 chars, letters + numbers)</label>
+              <input type="password" id="regPassword" required minlength="8" placeholder="Hunter@2026" />
+            </div>
+            <div class="form-group">
+              <label for="regRole">Choose Your Role</label>
+              <select id="regRole">
+                <option value="job_seeker">Job Seeker (Hunter)</option>
+                <option value="employer">Employer (Crew Captain)</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-pink btn-block">Create Account &amp; Set Sail</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 1: BROWSE JOBS (AUTHENTICATED ONLY) -->
+    <section id="view-jobs" class="view-section">
       <div class="hero-banner">
         <div>
-          <h1>Find Your Next Career Opportunity</h1>
-          <p>Search verified tech openings, filter by salary &amp; work mode, and track your application from Applied to Offer.</p>
+          <span class="hero-kicker">🧭 Active Bounties Board</span>
+          <h1>Discover Open Roles in the Philippines</h1>
+          <p>Filter by skill, city, work mode, and monthly Philippine Peso (₱) salary range.</p>
         </div>
-        <div class="hero-stats" id="heroStats">
+        <div class="hero-stats">
           <div class="stat-pill"><strong id="statOpenJobs">-</strong><span>Open Jobs</span></div>
           <div class="stat-pill"><strong id="statCompanies">-</strong><span>Companies</span></div>
         </div>
       </div>
 
-      <!-- Filter Bar -->
       <form class="filter-bar card" id="jobFilterForm">
         <div class="filter-grid">
-          <input type="text" id="filterKeyword" placeholder="Keyword, title, or skill (e.g. Node.js)" />
-          <input type="text" id="filterLocation" placeholder="Location (e.g. Remote, Austin)" />
+          <input type="text" id="filterKeyword" placeholder="Keyword, role, or skill (e.g. Node.js)" />
+          <input type="text" id="filterLocation" placeholder="Location (e.g. BGC, Makati, Cebu, Remote)" />
           <select id="filterType">
             <option value="">All Job Types</option>
             <option value="full-time">Full-Time</option>
@@ -75,16 +186,16 @@
             <option value="hybrid">Hybrid</option>
             <option value="onsite">Onsite</option>
           </select>
-          <input type="number" id="filterMinSalary" placeholder="Min Salary (USD)" min="0" step="5000" />
+          <input type="number" id="filterMinSalary" placeholder="Min Monthly Salary (₱ PHP)" min="0" step="5000" />
           <select id="filterSort">
             <option value="newest">Sort: Newest</option>
-            <option value="salary_desc">Sort: Highest Salary</option>
-            <option value="salary_asc">Sort: Lowest Salary</option>
+            <option value="salary_desc">Sort: Highest Salary (₱)</option>
+            <option value="salary_asc">Sort: Lowest Salary (₱)</option>
             <option value="most_applied">Sort: Most Applied</option>
           </select>
         </div>
         <div class="filter-actions">
-          <button type="submit" class="btn btn-primary">Search Jobs</button>
+          <button type="submit" class="btn btn-pink">Search Bounties</button>
           <button type="button" class="btn btn-ghost" id="btnResetFilters">Reset</button>
         </div>
       </form>
@@ -98,23 +209,145 @@
       <div class="pagination" id="jobsPagination"></div>
     </section>
 
-    <!-- VIEW 2: COMPANIES -->
+    <!-- VIEW 2: COMPANIES (PUBLIC) -->
     <section id="view-companies" class="view-section">
-      <div class="section-header">
+      <div class="section-header-banner">
         <div>
-          <h2>Hiring Companies</h2>
-          <p class="muted">Explore employer profiles and click any company to see its open positions.</p>
+          <span class="hero-kicker">🏢 Partner Crews</span>
+          <h2>Hiring Companies on JobHunters</h2>
+          <p>Discover verified Philippine tech companies and growing teams actively recruiting talent.</p>
         </div>
+        <div id="companiesGateNotice"></div>
       </div>
       <div class="companies-grid" id="companiesList"></div>
     </section>
 
-    <!-- VIEW 3: JOB SEEKER DASHBOARD -->
+    <!-- VIEW 3: ABOUT (PUBLIC) -->
+    <section id="view-about" class="view-section">
+      <div class="section-header-banner">
+        <div class="about-head-row">
+          <img src="/images/jobhunters-logo.jpg" alt="JobHunters Logo" class="about-logo" />
+          <div>
+            <span class="hero-kicker">⚓ Our Voyage</span>
+            <h2>About JobHunters PH</h2>
+            <p>Connecting Filipino talent and forward-thinking companies through transparent PHP (₱) salaries and streamlined applicant tracking.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="three-cards">
+        <div class="card feature-card">
+          <span class="feature-icon">🧭</span>
+          <h3>For Job Seekers</h3>
+          <p class="muted">Create your hunter profile, showcase your skills, upload your PDF/DOCX resume, save favorite openings, and track every application from Applied to Offer.</p>
+        </div>
+        <div class="card feature-card">
+          <span class="feature-icon">⚓</span>
+          <h3>For Employers</h3>
+          <p class="muted">Publish company profiles and PHP-denominated job listings, review applicants per opening, filter by skills, and advance candidates cleanly through your ATS pipeline.</p>
+        </div>
+        <div class="card feature-card">
+          <span class="feature-icon">🌸</span>
+          <h3>Built for the Philippines</h3>
+          <p class="muted">Designed around Metro Manila (BGC, Makati, Ortigas), Cebu IT Park, and nationwide remote work—with every salary clearly listed in Philippine Pesos (₱).</p>
+        </div>
+      </div>
+
+      <div class="card mt-16 about-story">
+        <h3>Why JobHunters?</h3>
+        <p class="muted">
+          Inspired by the spirit of adventure and teamwork of the Grand Line, <strong>JobHunters</strong> was engineered as a full-stack Express.js + MongoDB recruitment platform. We believe job hunting should never feel like sailing blind—that's why job browsing is protected for registered members, companies are verified by platform admins, and every application preserves a clear status history timeline.
+        </p>
+        <div class="skills-wrap" style="margin-top:12px;">
+          <span class="pill pill-skill">Node.js &amp; Express.js</span>
+          <span class="pill pill-pink">MongoDB &amp; Mongoose</span>
+          <span class="pill pill-skill">JWT RBAC Security</span>
+          <span class="pill pill-pink">PHP (₱) Salary Transparency</span>
+          <span class="pill pill-skill">Automated ATS Workflow</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 4: CONTACT (PUBLIC) -->
+    <section id="view-contact" class="view-section">
+      <div class="section-header-banner">
+        <div>
+          <span class="hero-kicker">📬 Den Den Mushi Support</span>
+          <h2>Contact JobHunters PH</h2>
+          <p>Have questions about hiring, company verification, or your hunter account? Reach out to our Manila crew.</p>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="card form-card">
+          <h3>Philippine Headquarters</h3>
+          <div class="contact-list">
+            <div class="contact-item">
+              <span class="contact-icon">📍</span>
+              <div>
+                <strong>Office Address</strong>
+                <p class="muted">24F Grand Line Tower, High Street South, BGC, Taguig City, Metro Manila 1634, Philippines</p>
+              </div>
+            </div>
+            <div class="contact-item">
+              <span class="contact-icon">✉️</span>
+              <div>
+                <strong>Email Support</strong>
+                <p class="muted">hello@jobhunters.ph • employers@jobhunters.ph</p>
+              </div>
+            </div>
+            <div class="contact-item">
+              <span class="contact-icon">📞</span>
+              <div>
+                <strong>Hotline (PHT)</strong>
+                <p class="muted">+63 (02) 8555-0199 • +63 917 555 0199</p>
+              </div>
+            </div>
+            <div class="contact-item">
+              <span class="contact-icon">🕒</span>
+              <div>
+                <strong>Support Hours</strong>
+                <p class="muted">Monday – Friday, 9:00 AM – 6:00 PM (Philippine Standard Time)</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <form class="card form-card" id="contactForm">
+          <h3>Send Us a Message</h3>
+          <div class="form-group">
+            <label for="contactName">Your Name *</label>
+            <input type="text" id="contactName" required placeholder="Maria Clara" />
+          </div>
+          <div class="form-group">
+            <label for="contactEmail">Email Address *</label>
+            <input type="email" id="contactEmail" required placeholder="maria@example.ph" />
+          </div>
+          <div class="form-group">
+            <label for="contactTopic">Topic</label>
+            <select id="contactTopic">
+              <option value="general">General Inquiry</option>
+              <option value="verification">Company Verification</option>
+              <option value="seeker">Job Seeker Support</option>
+              <option value="partnership">Enterprise Partnership</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="contactMessage">Message *</label>
+            <textarea id="contactMessage" rows="4" required placeholder="How can our crew help you?"></textarea>
+          </div>
+          <button type="submit" class="btn btn-pink">Send Message</button>
+          <div id="contactFeedback" class="resume-status hidden"></div>
+        </form>
+      </div>
+    </section>
+
+    <!-- VIEW 5: JOB SEEKER DASHBOARD -->
     <section id="view-seeker" class="view-section">
       <div class="section-header">
         <div>
           <h2>Job Seeker Workspace</h2>
-          <p class="muted">Track your submitted applications, saved jobs, and keep your profile &amp; resume up to date.</p>
+          <p class="muted">Track your submitted applications, saved bounties, and keep your profile &amp; resume ready.</p>
         </div>
       </div>
 
@@ -146,8 +379,8 @@
             </div>
             <div class="form-row">
               <div class="form-group">
-                <label for="profLocation">Location</label>
-                <input type="text" id="profLocation" placeholder="San Francisco, CA / Remote" />
+                <label for="profLocation">Location (PH)</label>
+                <input type="text" id="profLocation" placeholder="Makati City / Remote PH" />
               </div>
               <div class="form-group">
                 <label for="profExpYears">Experience (Years)</label>
@@ -172,7 +405,7 @@
                 <input type="url" id="profLinkedin" placeholder="https://linkedin.com/in/..." />
               </div>
             </div>
-            <button type="submit" class="btn btn-primary">Save Profile</button>
+            <button type="submit" class="btn btn-pink">Save Profile</button>
           </form>
 
           <div class="card form-card">
@@ -183,7 +416,7 @@
                 <label for="resumeFileInput">Select Resume File</label>
                 <input type="file" id="resumeFileInput" accept=".pdf,.doc,.docx" required />
               </div>
-              <button type="submit" class="btn btn-secondary">Upload Resume</button>
+              <button type="submit" class="btn btn-primary">Upload Resume</button>
             </form>
             <div id="currentResumeInfo" class="resume-status muted"></div>
           </div>
@@ -191,12 +424,12 @@
       </div>
     </section>
 
-    <!-- VIEW 4: EMPLOYER DASHBOARD -->
+    <!-- VIEW 6: EMPLOYER DASHBOARD -->
     <section id="view-employer" class="view-section">
       <div class="section-header">
         <div>
           <h2>Employer &amp; Applicant Tracking Dashboard</h2>
-          <p class="muted">Manage your company profile, publish job openings, and move applicants through your hiring pipeline.</p>
+          <p class="muted">Manage your company profile, publish PHP (₱) job openings, and move applicants through your hiring pipeline.</p>
         </div>
       </div>
 
@@ -212,15 +445,15 @@
 
       <div id="emp-create-job" class="sub-panel">
         <form class="card form-card" id="createJobForm">
-          <h3>Create Job Posting</h3>
+          <h3>Create Job Posting (PHP ₱)</h3>
           <div class="form-row">
             <div class="form-group">
               <label for="jobTitle">Job Title *</label>
               <input type="text" id="jobTitle" required placeholder="e.g. Senior Backend Engineer" />
             </div>
             <div class="form-group">
-              <label for="jobLocation">Location *</label>
-              <input type="text" id="jobLocation" required placeholder="e.g. San Francisco, CA or Remote" />
+              <label for="jobLocation">Location (PH) *</label>
+              <input type="text" id="jobLocation" required placeholder="e.g. BGC, Taguig or Remote (PH)" />
             </div>
           </div>
           <div class="form-row three-col">
@@ -254,12 +487,12 @@
           </div>
           <div class="form-row three-col">
             <div class="form-group">
-              <label for="jobSalaryMin">Min Salary *</label>
-              <input type="number" id="jobSalaryMin" required min="0" placeholder="90000" />
+              <label for="jobSalaryMin">Min Monthly Salary (₱ PHP) *</label>
+              <input type="number" id="jobSalaryMin" required min="0" placeholder="60000" />
             </div>
             <div class="form-group">
-              <label for="jobSalaryMax">Max Salary *</label>
-              <input type="number" id="jobSalaryMax" required min="0" placeholder="130000" />
+              <label for="jobSalaryMax">Max Monthly Salary (₱ PHP) *</label>
+              <input type="number" id="jobSalaryMax" required min="0" placeholder="95000" />
             </div>
             <div class="form-group">
               <label for="jobDeadline">Application Deadline</label>
@@ -278,7 +511,7 @@
             <label for="jobRequirements">Key Requirements (one per line)</label>
             <textarea id="jobRequirements" rows="3" placeholder="3+ years with Node.js&#10;Experience with MongoDB schema design"></textarea>
           </div>
-          <button type="submit" class="btn btn-primary">Publish Job Posting</button>
+          <button type="submit" class="btn btn-pink">Publish Job Posting</button>
         </form>
       </div>
 
@@ -297,7 +530,7 @@
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label for="compLocation">Location *</label>
+              <label for="compLocation">Location (PH) *</label>
               <input type="text" id="compLocation" required />
             </div>
             <div class="form-group">
@@ -315,23 +548,23 @@
           <div class="form-row">
             <div class="form-group">
               <label for="compWebsite">Website URL</label>
-              <input type="url" id="compWebsite" placeholder="https://company.com" />
+              <input type="url" id="compWebsite" placeholder="https://company.ph" />
             </div>
             <div class="form-group">
               <label for="compEmail">Contact Email</label>
-              <input type="email" id="compEmail" placeholder="careers@company.com" />
+              <input type="email" id="compEmail" placeholder="careers@company.ph" />
             </div>
           </div>
           <div class="form-group">
             <label for="compDescription">Company Description *</label>
             <textarea id="compDescription" rows="4" required></textarea>
           </div>
-          <button type="submit" class="btn btn-primary">Save Company Profile</button>
+          <button type="submit" class="btn btn-pink">Save Company Profile</button>
         </form>
       </div>
     </section>
 
-    <!-- VIEW 5: ADMIN PANEL -->
+    <!-- VIEW 7: ADMIN PANEL -->
     <section id="view-admin" class="view-section">
       <div class="section-header">
         <div>
@@ -373,66 +606,6 @@
     </section>
   </main>
 
-  <!-- MODAL: AUTH (LOGIN / REGISTER) -->
-  <div class="modal-backdrop hidden" id="authModal">
-    <div class="modal-dialog modal-sm">
-      <div class="modal-header">
-        <h3 id="authModalTitle">Sign In</h3>
-        <button class="icon-btn" data-close-modal="authModal" aria-label="Close">&times;</button>
-      </div>
-      <div class="modal-body">
-        <div class="auth-switch">
-          <button type="button" class="sub-tab active" id="switchLogin">Sign In</button>
-          <button type="button" class="sub-tab" id="switchRegister">Register</button>
-        </div>
-
-        <form id="loginForm">
-          <div class="form-group">
-            <label for="loginEmail">Email</label>
-            <input type="email" id="loginEmail" required placeholder="you@example.com" />
-          </div>
-          <div class="form-group">
-            <label for="loginPassword">Password</label>
-            <input type="password" id="loginPassword" required placeholder="••••••••" />
-          </div>
-          <button type="submit" class="btn btn-primary btn-block">Sign In</button>
-
-          <div class="demo-box">
-            <p class="demo-title">Quick Demo Login</p>
-            <div class="demo-btns">
-              <button type="button" class="btn btn-outline btn-xs" data-demo-email="alice@seeker.com" data-demo-pass="Seeker@123">Job Seeker (Alice)</button>
-              <button type="button" class="btn btn-outline btn-xs" data-demo-email="hr@techflow.io" data-demo-pass="Employer@123">Employer (TechFlow)</button>
-              <button type="button" class="btn btn-outline btn-xs" data-demo-email="admin@jobportal.com" data-demo-pass="Admin@123">Admin</button>
-            </div>
-          </div>
-        </form>
-
-        <form id="registerForm" class="hidden">
-          <div class="form-group">
-            <label for="regName">Full Name</label>
-            <input type="text" id="regName" required placeholder="Jane Doe" />
-          </div>
-          <div class="form-group">
-            <label for="regEmail">Email</label>
-            <input type="email" id="regEmail" required placeholder="jane@example.com" />
-          </div>
-          <div class="form-group">
-            <label for="regPassword">Password (min 8 chars, letters + numbers)</label>
-            <input type="password" id="regPassword" required minlength="8" placeholder="Password123" />
-          </div>
-          <div class="form-group">
-            <label for="regRole">Account Type</label>
-            <select id="regRole">
-              <option value="job_seeker">Job Seeker</option>
-              <option value="employer">Employer</option>
-            </select>
-          </div>
-          <button type="submit" class="btn btn-primary btn-block">Create Account</button>
-        </form>
-      </div>
-    </div>
-  </div>
-
   <!-- MODAL: JOB DETAIL & APPLY -->
   <div class="modal-backdrop hidden" id="jobDetailModal">
     <div class="modal-dialog modal-lg">
@@ -466,10 +639,12 @@
 
   <footer class="footer">
     <div class="container footer-inner">
-      <span>TalentBridge — Job Recruitment Portal (Express.js + MongoDB REST API)</span>
+      <div class="footer-brand">
+        <img src="/images/jobhunters-logo.jpg" alt="JobHunters" class="footer-logo" />
+        <span><strong>JobHunters PH</strong> — Express.js + MongoDB Recruitment Portal (PHP ₱)</span>
+      </div>
       <div class="footer-links">
         <a href="/api/health" target="_blank" rel="noopener">API Health</a>
-        <a href="/api/jobs" target="_blank" rel="noopener">Jobs JSON</a>
         <a href="/api" target="_blank" rel="noopener">API Map</a>
       </div>
     </div>
