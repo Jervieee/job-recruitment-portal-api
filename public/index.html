@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TalentBridge — Job Recruitment Portal</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <!-- Top Navigation -->
+  <header class="navbar">
+    <div class="container nav-inner">
+      <div class="brand" id="brandHome" role="button" tabindex="0">
+        <span class="brand-logo">TB</span>
+        <div>
+          <span class="brand-name">TalentBridge</span>
+          <span class="brand-tag">Job Recruitment Portal</span>
+        </div>
+      </div>
+
+      <nav class="nav-tabs" id="navTabs">
+        <button class="nav-tab active" data-view="jobs">Browse Jobs</button>
+        <button class="nav-tab" data-view="companies">Companies</button>
+        <button class="nav-tab hidden" data-view="seeker" id="tabSeeker">My Applications &amp; Profile</button>
+        <button class="nav-tab hidden" data-view="employer" id="tabEmployer">Employer ATS</button>
+        <button class="nav-tab hidden" data-view="admin" id="tabAdmin">Admin Panel</button>
+      </nav>
+
+      <div class="nav-auth" id="navAuth">
+        <button class="btn btn-ghost" id="btnOpenLogin">Sign In</button>
+        <button class="btn btn-primary" id="btnOpenRegister">Register</button>
+      </div>
+
+      <div class="nav-user hidden" id="navUser">
+        <div class="user-chip">
+          <span class="user-name" id="currentUserName"></span>
+          <span class="role-badge" id="currentUserRole"></span>
+        </div>
+        <button class="btn btn-ghost btn-sm" id="btnLogout">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="container main-content">
+    <!-- VIEW 1: BROWSE JOBS -->
+    <section id="view-jobs" class="view-section active">
+      <div class="hero-banner">
+        <div>
+          <h1>Find Your Next Career Opportunity</h1>
+          <p>Search verified tech openings, filter by salary &amp; work mode, and track your application from Applied to Offer.</p>
+        </div>
+        <div class="hero-stats" id="heroStats">
+          <div class="stat-pill"><strong id="statOpenJobs">-</strong><span>Open Jobs</span></div>
+          <div class="stat-pill"><strong id="statCompanies">-</strong><span>Companies</span></div>
+        </div>
+      </div>
+
+      <!-- Filter Bar -->
+      <form class="filter-bar card" id="jobFilterForm">
+        <div class="filter-grid">
+          <input type="text" id="filterKeyword" placeholder="Keyword, title, or skill (e.g. Node.js)" />
+          <input type="text" id="filterLocation" placeholder="Location (e.g. Remote, Austin)" />
+          <select id="filterType">
+            <option value="">All Job Types</option>
+            <option value="full-time">Full-Time</option>
+            <option value="part-time">Part-Time</option>
+            <option value="contract">Contract</option>
+            <option value="internship">Internship</option>
+            <option value="freelance">Freelance</option>
+          </select>
+          <select id="filterWorkMode">
+            <option value="">All Work Modes</option>
+            <option value="remote">Remote</option>
+            <option value="hybrid">Hybrid</option>
+            <option value="onsite">Onsite</option>
+          </select>
+          <input type="number" id="filterMinSalary" placeholder="Min Salary (USD)" min="0" step="5000" />
+          <select id="filterSort">
+            <option value="newest">Sort: Newest</option>
+            <option value="salary_desc">Sort: Highest Salary</option>
+            <option value="salary_asc">Sort: Lowest Salary</option>
+            <option value="most_applied">Sort: Most Applied</option>
+          </select>
+        </div>
+        <div class="filter-actions">
+          <button type="submit" class="btn btn-primary">Search Jobs</button>
+          <button type="button" class="btn btn-ghost" id="btnResetFilters">Reset</button>
+        </div>
+      </form>
+
+      <div class="results-header">
+        <span id="jobsCountLabel">Loading jobs...</span>
+      </div>
+
+      <div class="jobs-grid" id="jobsList"></div>
+
+      <div class="pagination" id="jobsPagination"></div>
+    </section>
+
+    <!-- VIEW 2: COMPANIES -->
+    <section id="view-companies" class="view-section">
+      <div class="section-header">
+        <div>
+          <h2>Hiring Companies</h2>
+          <p class="muted">Explore employer profiles and click any company to see its open positions.</p>
+        </div>
+      </div>
+      <div class="companies-grid" id="companiesList"></div>
+    </section>
+
+    <!-- VIEW 3: JOB SEEKER DASHBOARD -->
+    <section id="view-seeker" class="view-section">
+      <div class="section-header">
+        <div>
+          <h2>Job Seeker Workspace</h2>
+          <p class="muted">Track your submitted applications, saved jobs, and keep your profile &amp; resume up to date.</p>
+        </div>
+      </div>
+
+      <div class="sub-tabs" id="seekerSubTabs">
+        <button class="sub-tab active" data-subtab="seeker-apps">My Applications</button>
+        <button class="sub-tab" data-subtab="seeker-saved">Saved Jobs</button>
+        <button class="sub-tab" data-subtab="seeker-profile">My Profile &amp; Resume</button>
+      </div>
+
+      <div id="seeker-apps" class="sub-panel active">
+        <div id="myApplicationsList" class="stack-list"></div>
+      </div>
+
+      <div id="seeker-saved" class="sub-panel">
+        <div id="savedJobsList" class="jobs-grid"></div>
+      </div>
+
+      <div id="seeker-profile" class="sub-panel">
+        <div class="two-col">
+          <form class="card form-card" id="seekerProfileForm">
+            <h3>Candidate Profile</h3>
+            <div class="form-group">
+              <label for="profHeadline">Headline</label>
+              <input type="text" id="profHeadline" placeholder="e.g. Full-Stack Node.js Developer" />
+            </div>
+            <div class="form-group">
+              <label for="profBio">Bio</label>
+              <textarea id="profBio" rows="3" placeholder="Brief summary of your background..."></textarea>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="profLocation">Location</label>
+                <input type="text" id="profLocation" placeholder="San Francisco, CA / Remote" />
+              </div>
+              <div class="form-group">
+                <label for="profExpYears">Experience (Years)</label>
+                <input type="number" id="profExpYears" min="0" max="60" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="profSkills">Skills (comma-separated)</label>
+              <input type="text" id="profSkills" placeholder="Node.js, Express, MongoDB, React" />
+            </div>
+            <div class="form-group">
+              <label for="profResumeUrl">Resume / CV Link</label>
+              <input type="text" id="profResumeUrl" placeholder="https://example.com/my-cv.pdf" />
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="profPortfolio">Portfolio URL</label>
+                <input type="url" id="profPortfolio" placeholder="https://myportfolio.dev" />
+              </div>
+              <div class="form-group">
+                <label for="profLinkedin">LinkedIn URL</label>
+                <input type="url" id="profLinkedin" placeholder="https://linkedin.com/in/..." />
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Save Profile</button>
+          </form>
+
+          <div class="card form-card">
+            <h3>Upload Resume File</h3>
+            <p class="muted">Upload a PDF, DOC, or DOCX resume (max 5MB). It automatically updates your profile's resume link.</p>
+            <form id="resumeUploadForm">
+              <div class="form-group">
+                <label for="resumeFileInput">Select Resume File</label>
+                <input type="file" id="resumeFileInput" accept=".pdf,.doc,.docx" required />
+              </div>
+              <button type="submit" class="btn btn-secondary">Upload Resume</button>
+            </form>
+            <div id="currentResumeInfo" class="resume-status muted"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 4: EMPLOYER DASHBOARD -->
+    <section id="view-employer" class="view-section">
+      <div class="section-header">
+        <div>
+          <h2>Employer &amp; Applicant Tracking Dashboard</h2>
+          <p class="muted">Manage your company profile, publish job openings, and move applicants through your hiring pipeline.</p>
+        </div>
+      </div>
+
+      <div class="sub-tabs" id="employerSubTabs">
+        <button class="sub-tab active" data-subtab="emp-jobs">My Posted Jobs &amp; Applicants</button>
+        <button class="sub-tab" data-subtab="emp-create-job">Post a New Job</button>
+        <button class="sub-tab" data-subtab="emp-company">Company Profile</button>
+      </div>
+
+      <div id="emp-jobs" class="sub-panel active">
+        <div id="employerJobsList" class="stack-list"></div>
+      </div>
+
+      <div id="emp-create-job" class="sub-panel">
+        <form class="card form-card" id="createJobForm">
+          <h3>Create Job Posting</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="jobTitle">Job Title *</label>
+              <input type="text" id="jobTitle" required placeholder="e.g. Senior Backend Engineer" />
+            </div>
+            <div class="form-group">
+              <label for="jobLocation">Location *</label>
+              <input type="text" id="jobLocation" required placeholder="e.g. San Francisco, CA or Remote" />
+            </div>
+          </div>
+          <div class="form-row three-col">
+            <div class="form-group">
+              <label for="jobType">Job Type *</label>
+              <select id="jobType" required>
+                <option value="full-time">Full-Time</option>
+                <option value="part-time">Part-Time</option>
+                <option value="contract">Contract</option>
+                <option value="internship">Internship</option>
+                <option value="freelance">Freelance</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="jobWorkMode">Work Mode</label>
+              <select id="jobWorkMode">
+                <option value="remote">Remote</option>
+                <option value="hybrid">Hybrid</option>
+                <option value="onsite">Onsite</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="jobExpLevel">Experience Level</label>
+              <select id="jobExpLevel">
+                <option value="entry">Entry</option>
+                <option value="mid" selected>Mid</option>
+                <option value="senior">Senior</option>
+                <option value="lead">Lead</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row three-col">
+            <div class="form-group">
+              <label for="jobSalaryMin">Min Salary *</label>
+              <input type="number" id="jobSalaryMin" required min="0" placeholder="90000" />
+            </div>
+            <div class="form-group">
+              <label for="jobSalaryMax">Max Salary *</label>
+              <input type="number" id="jobSalaryMax" required min="0" placeholder="130000" />
+            </div>
+            <div class="form-group">
+              <label for="jobDeadline">Application Deadline</label>
+              <input type="date" id="jobDeadline" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="jobSkills">Required Skills (comma-separated) *</label>
+            <input type="text" id="jobSkills" required placeholder="Node.js, Express, MongoDB, Docker" />
+          </div>
+          <div class="form-group">
+            <label for="jobDescription">Job Description *</label>
+            <textarea id="jobDescription" rows="4" required minlength="20" placeholder="Describe the role, team, and impact (min 20 chars)..."></textarea>
+          </div>
+          <div class="form-group">
+            <label for="jobRequirements">Key Requirements (one per line)</label>
+            <textarea id="jobRequirements" rows="3" placeholder="3+ years with Node.js&#10;Experience with MongoDB schema design"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">Publish Job Posting</button>
+        </form>
+      </div>
+
+      <div id="emp-company" class="sub-panel">
+        <form class="card form-card" id="companyProfileForm">
+          <h3>Employer Company Profile</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="compName">Company Name *</label>
+              <input type="text" id="compName" required />
+            </div>
+            <div class="form-group">
+              <label for="compIndustry">Industry *</label>
+              <input type="text" id="compIndustry" required />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="compLocation">Location *</label>
+              <input type="text" id="compLocation" required />
+            </div>
+            <div class="form-group">
+              <label for="compSize">Company Size</label>
+              <select id="compSize">
+                <option value="1-10">1-10</option>
+                <option value="11-50">11-50</option>
+                <option value="51-200">51-200</option>
+                <option value="201-500">201-500</option>
+                <option value="501-1000">501-1000</option>
+                <option value="1000+">1000+</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="compWebsite">Website URL</label>
+              <input type="url" id="compWebsite" placeholder="https://company.com" />
+            </div>
+            <div class="form-group">
+              <label for="compEmail">Contact Email</label>
+              <input type="email" id="compEmail" placeholder="careers@company.com" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="compDescription">Company Description *</label>
+            <textarea id="compDescription" rows="4" required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">Save Company Profile</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- VIEW 5: ADMIN PANEL -->
+    <section id="view-admin" class="view-section">
+      <div class="section-header">
+        <div>
+          <h2>Admin Overview &amp; Moderation</h2>
+          <p class="muted">Real-time platform analytics, company verification, and user access control.</p>
+        </div>
+      </div>
+
+      <div class="analytics-grid" id="adminStatsGrid"></div>
+
+      <div class="two-col admin-tables">
+        <div class="card">
+          <h3>Companies (Verification)</h3>
+          <div id="adminCompaniesList" class="stack-list compact"></div>
+        </div>
+        <div class="card">
+          <h3>Top In-Demand Skills</h3>
+          <div id="adminTopSkills" class="skills-bars"></div>
+        </div>
+      </div>
+
+      <div class="card mt-16">
+        <h3>User Management</h3>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="adminUsersBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- MODAL: AUTH (LOGIN / REGISTER) -->
+  <div class="modal-backdrop hidden" id="authModal">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-header">
+        <h3 id="authModalTitle">Sign In</h3>
+        <button class="icon-btn" data-close-modal="authModal" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="auth-switch">
+          <button type="button" class="sub-tab active" id="switchLogin">Sign In</button>
+          <button type="button" class="sub-tab" id="switchRegister">Register</button>
+        </div>
+
+        <form id="loginForm">
+          <div class="form-group">
+            <label for="loginEmail">Email</label>
+            <input type="email" id="loginEmail" required placeholder="you@example.com" />
+          </div>
+          <div class="form-group">
+            <label for="loginPassword">Password</label>
+            <input type="password" id="loginPassword" required placeholder="••••••••" />
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+
+          <div class="demo-box">
+            <p class="demo-title">Quick Demo Login</p>
+            <div class="demo-btns">
+              <button type="button" class="btn btn-outline btn-xs" data-demo-email="alice@seeker.com" data-demo-pass="Seeker@123">Job Seeker (Alice)</button>
+              <button type="button" class="btn btn-outline btn-xs" data-demo-email="hr@techflow.io" data-demo-pass="Employer@123">Employer (TechFlow)</button>
+              <button type="button" class="btn btn-outline btn-xs" data-demo-email="admin@jobportal.com" data-demo-pass="Admin@123">Admin</button>
+            </div>
+          </div>
+        </form>
+
+        <form id="registerForm" class="hidden">
+          <div class="form-group">
+            <label for="regName">Full Name</label>
+            <input type="text" id="regName" required placeholder="Jane Doe" />
+          </div>
+          <div class="form-group">
+            <label for="regEmail">Email</label>
+            <input type="email" id="regEmail" required placeholder="jane@example.com" />
+          </div>
+          <div class="form-group">
+            <label for="regPassword">Password (min 8 chars, letters + numbers)</label>
+            <input type="password" id="regPassword" required minlength="8" placeholder="Password123" />
+          </div>
+          <div class="form-group">
+            <label for="regRole">Account Type</label>
+            <select id="regRole">
+              <option value="job_seeker">Job Seeker</option>
+              <option value="employer">Employer</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Create Account</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: JOB DETAIL & APPLY -->
+  <div class="modal-backdrop hidden" id="jobDetailModal">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <div>
+          <h3 id="detailJobTitle">Job Details</h3>
+          <p class="muted" id="detailJobSubtitle"></p>
+        </div>
+        <button class="icon-btn" data-close-modal="jobDetailModal" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body" id="jobDetailBody"></div>
+    </div>
+  </div>
+
+  <!-- MODAL: EMPLOYER APPLICANTS ATS -->
+  <div class="modal-backdrop hidden" id="applicantsModal">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <div>
+          <h3 id="applicantsModalTitle">Job Applicants</h3>
+          <p class="muted" id="applicantsModalSummary"></p>
+        </div>
+        <button class="icon-btn" data-close-modal="applicantsModal" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body" id="applicantsModalBody"></div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <span>TalentBridge — Job Recruitment Portal (Express.js + MongoDB REST API)</span>
+      <div class="footer-links">
+        <a href="/api/health" target="_blank" rel="noopener">API Health</a>
+        <a href="/api/jobs" target="_blank" rel="noopener">Jobs JSON</a>
+        <a href="/api" target="_blank" rel="noopener">API Map</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/app.js"></script>
+</body>
+</html>

@@ -126,7 +126,9 @@ npm run dev
 npm start
 ```
 
-The API will be available at `http://localhost:5000` (health check at `GET /api/health`).
+The web portal UI will be available at `http://localhost:5000`, and the REST API at `http://localhost:5000/api` (health check at `GET /api/health`).
+
+> **Note**: In `development` mode, if local MongoDB is not running on port `27017`, the server automatically starts an in-memory MongoDB instance and seeds all demo accounts so you can explore the full UI & API immediately.
 
 ---
 

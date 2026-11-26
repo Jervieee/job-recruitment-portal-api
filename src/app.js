@@ -35,19 +35,21 @@ app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 // Sanitize against NoSQL injection & prototype pollution
 app.use(sanitizeRequest);
 
-// Serve uploaded resume files
+// Serve uploaded resume files & frontend web UI
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+app.use(express.static(path.join(process.cwd(), 'public')));
 
 // Apply general rate limiting to all /api endpoints
 app.use('/api', apiLimiter);
 
-// Root endpoint
-app.get('/', (req, res) =>
+// API root index
+app.get('/api', (req, res) =>
   sendSuccess(res, {
     statusCode: 200,
     message: 'Welcome to the Job Recruitment Portal REST API',
     data: {
       version: '1.0.0',
+      webUi: '/',
       healthCheck: '/api/health',
       endpoints: {
         auth: '/api/auth',
@@ -62,7 +64,7 @@ app.get('/', (req, res) =>
   })
 );
 
-// Mount API v1 routes
+// Mount API routes
 app.use('/api', routes);
 
 // 404 and centralized error handling
